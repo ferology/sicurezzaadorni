@@ -884,19 +884,29 @@
     background: var(--paper);
     color: var(--ink);
     border-radius: 6px;
-    padding: 32px 36px;
+    padding: 26px 32px;
     max-width: 980px;
     width: 92%;
+    max-height: 84vh;
+    overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: var(--shadow), 0 0 0 1px rgba(0,0,0,0.1);
     position: relative;
-    overflow: hidden;
     background-image:
-      repeating-linear-gradient(0deg, transparent 0, transparent 36px, rgba(40,60,100,0.15) 36px, rgba(40,60,100,0.15) 37px),
+      repeating-linear-gradient(0deg, transparent 0, transparent 32px, rgba(40,60,100,0.15) 32px, rgba(40,60,100,0.15) 33px),
       linear-gradient(135deg, var(--paper) 0%, #ead8a6 100%);
     background-size: 100% auto, auto;
     transform: rotate(-0.5deg);
     border-left: 4px solid var(--upside-red);
+    scrollbar-width: thin;
+    scrollbar-color: var(--upside-red) transparent;
   }
+  .story::-webkit-scrollbar { width: 8px; }
+  .story::-webkit-scrollbar-track { background: transparent; }
+  .story::-webkit-scrollbar-thumb { background: rgba(220, 38, 38, 0.5); border-radius: 4px; }
+  .story::-webkit-scrollbar-thumb:hover { background: rgba(220, 38, 38, 0.7); }
+  .story p { font-size: clamp(1rem, 1.7vw, 1.4rem); margin-bottom: 8px; }
+  .story .lesson { margin-top: 12px; padding: 14px 18px; font-size: clamp(.95rem, 1.6vw, 1.3rem); }
   .story::before {
     content: 'FILE CASO';
     position: absolute;
@@ -984,13 +994,16 @@
     100% { opacity: 1; transform: rotate(-2deg) scale(1); }
   }
   .source-note {
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px dashed rgba(0, 0, 0, 0.25);
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: rgba(220, 38, 38, 0.08);
+    border-left: 3px solid var(--upside-red);
+    border-radius: 4px;
     font-family: 'VT323', monospace;
-    font-size: 0.95rem;
-    letter-spacing: 0.5px;
-    color: rgba(0, 0, 0, 0.55);
+    font-size: clamp(0.9rem, 1.4vw, 1.1rem);
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+    color: var(--ink);
     display: none;
   }
   .source-note b { color: var(--upside-red-deep); font-family: inherit; }
@@ -1972,7 +1985,7 @@
         💡 <b>LEZIONE:</b> Online <u>non puoi essere sicuro</u> di chi c'è dall'altra parte. Anche se sembra un bambino come te, potrebbe essere un Demogorgone. <b>Se qualcuno chiede foto o info → chiama l'adulto SUBITO</b> 📻
       </div>
       <button class="reveal-real-btn" onclick="revealReal(this)">SCOPRI LA STORIA VERA</button>
-      <div class="source-note">📁 <b>Successo davvero · Torino, aprile 2026</b> · Indagine della Procura di Torino. Solo nel 2025, la Polizia Postale italiana ha trattato <b>434 casi</b> di adescamento online di minori.</div>
+      <div class="source-note">📁 <b>Successo davvero · Torino, aprile 2026.</b><br>Polizia Postale: <b>434 casi</b> di adescamento di minori nel 2025.</div>
     </div>
   </section>
 
@@ -2058,7 +2071,7 @@
         💡 <b>LEZIONE:</b> Nessuno regala niente di valore. "Robux gratis", "V-Bucks gratis", "skin gratis" sono <u>SEMPRE trappole</u>. Non cliccare. Se hai dubbi → walkie-talkie 📻 a un adulto PRIMA.
       </div>
       <button class="reveal-real-btn" onclick="revealReal(this)">SCOPRI LA STORIA VERA</button>
-      <div class="source-note">📁 <b>Fenomeno documentato in Italia</b> · Polizia Postale: <b>2.623 casi</b> di crimini informatici trattati nel 2025. Fonti: McAfee, Kaspersky, Money.it.</div>
+      <div class="source-note">📁 <b>Fenomeno reale in Italia.</b><br>Polizia Postale: <b>2.623 casi</b> di crimini informatici nel 2025.<br>Fonti: McAfee, Kaspersky.</div>
     </div>
   </section>
 
@@ -2196,7 +2209,7 @@
         💡 <b>LEZIONE:</b> Se qualcuno ti scrive cose cattive → <u>NON sei tu il problema</u>. Non rispondere, fai screenshot, walkie-talkie 📻 a un adulto. Non sei mai solo.
       </div>
       <button class="reveal-real-btn" onclick="revealReal(this)">SCOPRI LA STORIA VERA</button>
-      <div class="source-note">📁 <b>Successo davvero · Eboli (SA), febbraio 2026</b> · I casi di cyberbullismo sono in aumento (+12%) — più colpita la fascia 6-13 anni. Fonte: SalernoToday, Quotidiano Nazionale.</div>
+      <div class="source-note">📁 <b>Successo davvero · Eboli (SA), febbraio 2026.</b><br>Cyberbullismo in aumento <b>+12%</b> nei bambini 6-13 anni.<br>Fonte: SalernoToday.</div>
     </div>
   </section>
 
@@ -2536,6 +2549,13 @@
     container.classList.add('real-revealed');
     // small burst of red confetti for dramatic effect
     burstConfetti(30);
+    // Scroll the revealed source-note into view inside the scrollable story
+    setTimeout(() => {
+      const revealed = container.querySelector('.source-note, .hidden-facts');
+      if (revealed && typeof revealed.scrollIntoView === 'function') {
+        revealed.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    }, 350);
   }
 
   // ============================
