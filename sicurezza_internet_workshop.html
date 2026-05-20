@@ -1,0 +1,2779 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missione SOTTOSOPRA — Workshop sulla Sicurezza in Internet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bowlby+One&family=Cormorant+Garamond:wght@600;700&family=DM+Serif+Display:ital@0;1&family=Playfair+Display:ital,wght@1,700;1,900&family=Fredoka:wght@400;500;600;700&family=Caveat:wght@600;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --hawkins-blue: #1e3a8a;
+    --hawkins-blue-light: #3b82f6;
+    --upside-red: #dc2626;
+    --upside-red-deep: #7f1d1d;
+    --upside-pink: #ec4899;
+    --hawkins-yellow: #fbbf24;
+    --hawkins-yellow-deep: #f59e0b;
+    --eleven-purple: #8b5cf6;
+    --eleven-purple-deep: #6d28d9;
+    --green-glow: #10b981;
+    --bg-dark: #0a0a14;
+    --bg-mid: #14142b;
+    --bg-light: #1f2547;
+    --paper: #f5ecd5;
+    --paper-dark: #d4c190;
+    --text: #f1f5f9;
+    --text-dim: #94a3b8;
+    --ink: #1a1d3a;
+    --radius: 18px;
+    --radius-lg: 26px;
+    --shadow: 0 20px 50px rgba(0,0,0,0.5);
+    --glow-red: 0 0 30px rgba(220,38,38,0.6);
+    --glow-blue: 0 0 30px rgba(59,130,246,0.6);
+    --glow-purple: 0 0 30px rgba(139,92,246,0.6);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Fredoka', system-ui, sans-serif;
+    color: var(--text);
+    background: var(--bg-dark);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* === BACKGROUND LAYERS === */
+  .bg-mesh {
+    position: fixed;
+    inset: 0;
+    z-index: -3;
+    background:
+      radial-gradient(at 15% 20%, rgba(220, 38, 38, 0.35) 0px, transparent 50%),
+      radial-gradient(at 85% 15%, rgba(139, 92, 246, 0.3) 0px, transparent 50%),
+      radial-gradient(at 80% 85%, rgba(30, 58, 138, 0.4) 0px, transparent 55%),
+      radial-gradient(at 20% 80%, rgba(236, 72, 153, 0.25) 0px, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(124, 58, 237, 0.15) 0px, transparent 60%),
+      linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-mid) 50%, var(--bg-light) 100%);
+    animation: meshShift 22s ease-in-out infinite alternate;
+  }
+  @keyframes meshShift {
+    0% { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.12) rotate(2deg); }
+  }
+
+  /* Lightning flicker layer */
+  .bg-flicker {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: rgba(255, 255, 255, 0);
+    animation: flicker 8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes flicker {
+    0%, 100% { background: rgba(255,255,255,0); }
+    50% { background: rgba(255,255,255,0); }
+    51% { background: rgba(255,200,200,0.06); }
+    52% { background: rgba(255,255,255,0); }
+    53% { background: rgba(255,200,200,0.08); }
+    54% { background: rgba(255,255,255,0); }
+  }
+
+  /* Floating ash particles */
+  .bg-ash {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .ash {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 230, 200, 0.5);
+    border-radius: 50%;
+    bottom: -20px;
+    filter: blur(0.5px);
+    animation: ashRise linear infinite;
+    box-shadow: 0 0 8px rgba(255, 220, 180, 0.4);
+  }
+  @keyframes ashRise {
+    0% { transform: translateY(0) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-110vh) translateX(60px); opacity: 0; }
+  }
+
+  /* Christmas lights string (Joyce's wall) */
+  .lights {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    right: 0;
+    height: 90px;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .lights svg { width: 100%; height: 100%; }
+  .bulb {
+    transform-origin: top center;
+    transform-box: fill-box;
+  }
+  .bulb-glow { mix-blend-mode: screen; }
+  @keyframes twinkle1 { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+  @keyframes twinkle2 { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+  @keyframes twinkle3 { 0%,100% { opacity: 0.7; } 25% { opacity: 0.3; } 75% { opacity: 1; } }
+
+  /* Vines on edges */
+  .vines {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 110px;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+  .vines.left { left: 0; }
+  .vines.right { right: 0; transform: scaleX(-1); }
+  .vines svg { width: 100%; height: 100%; }
+  .vines path {
+    animation: vineWave 14s ease-in-out infinite;
+    transform-origin: top center;
+    transform-box: fill-box;
+  }
+  @keyframes vineWave {
+    0%,100% { transform: translateX(0) rotate(0deg); }
+    50% { transform: translateX(4px) rotate(0.5deg); }
+  }
+
+  /* D20 dice */
+  .d20 {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    margin-top: 4px;
+    filter: drop-shadow(0 4px 12px rgba(220,38,38,0.4));
+  }
+  .d20 text {
+    font-family: 'Bowlby One', sans-serif;
+    fill: var(--hawkins-yellow);
+  }
+
+  /* Hellfire Club crest */
+  .hellfire {
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    vertical-align: middle;
+    filter: drop-shadow(0 0 18px rgba(220,38,38,0.6));
+  }
+
+  /* Bicycle silhouettes */
+  .bikes {
+    position: absolute;
+    bottom: 8vh;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 80px;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+    animation: bikeRoll 18s linear infinite;
+  }
+  .bikes svg { width: 100%; height: 100%; }
+  @keyframes bikeRoll {
+    0% { transform: translateX(-30%); }
+    100% { transform: translateX(30%); }
+  }
+
+  /* Pendulum animation for grandfather clock */
+  .pendulum { transform-origin: 100px 70px; transform-box: fill-box; animation: tickTock 1.5s ease-in-out infinite; }
+  @keyframes tickTock {
+    0%,100% { transform: rotate(-12deg); }
+    50% { transform: rotate(12deg); }
+  }
+  .clock-icon { width: clamp(110px, 14vw, 180px); height: auto; filter: drop-shadow(0 0 24px rgba(220,38,38,0.5)); }
+  .walkie-icon { width: clamp(130px, 16vw, 200px); height: auto; filter: drop-shadow(0 0 24px rgba(251,191,36,0.4)); }
+  .waffle-icon { width: clamp(80px, 10vw, 130px); height: auto; vertical-align: middle; margin-right: 8px; filter: drop-shadow(0 4px 12px rgba(251,191,36,0.4)); }
+  .walkman-icon { width: clamp(130px, 16vw, 200px); height: auto; filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5)); }
+
+  /* === Official ST artwork (themed colored SVGs) === */
+  .st-art {
+    filter: drop-shadow(0 0 22px rgba(220, 38, 38, 0.55)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6));
+    height: auto;
+    object-fit: contain;
+    animation: stFloat 6s ease-in-out infinite;
+  }
+  @keyframes stFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  .st-art.banner { width: clamp(280px, 48vw, 620px); max-height: 36vh; }
+  .st-art.large  { width: clamp(220px, 32vw, 420px); max-height: 28vh; }
+  .st-art.medium { width: clamp(170px, 22vw, 310px); max-height: 24vh; }
+  .st-art.small  { width: clamp(120px, 16vw, 220px); max-height: 18vh; }
+  .st-art.tiny   { width: clamp(70px, 10vw, 140px); max-height: 12vh; }
+  .st-art.no-float { animation: none; }
+  .st-art.yellow-glow-art {
+    filter: drop-shadow(0 0 22px rgba(251, 191, 36, 0.65)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6));
+  }
+  .st-art.purple-glow-art {
+    filter: drop-shadow(0 0 22px rgba(139, 92, 246, 0.65)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.6));
+  }
+
+  /* === STAGE === */
+  .stage {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 5vw;
+    opacity: 0;
+    transform: translateX(60px) scale(0.98);
+    transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+  }
+  .slide.active {
+    display: flex;
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  .slide > * { animation: slideUp .8s cubic-bezier(.16,1,.3,1) backwards; }
+  .slide.active > *:nth-child(1) { animation-delay: .1s; }
+  .slide.active > *:nth-child(2) { animation-delay: .22s; }
+  .slide.active > *:nth-child(3) { animation-delay: .34s; }
+  .slide.active > *:nth-child(4) { animation-delay: .46s; }
+  .slide.active > *:nth-child(5) { animation-delay: .58s; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === TYPOGRAPHY === */
+  h1 {
+    font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+    font-weight: 700;
+    font-size: clamp(2.8rem, 7vw, 6rem);
+    line-height: 0.95;
+    text-align: center;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--upside-red);
+    text-stroke: 1.5px var(--upside-red);
+    text-shadow:
+      0 0 8px rgba(220, 38, 38, 0.9),
+      0 0 18px rgba(220, 38, 38, 0.7),
+      0 0 36px rgba(220, 38, 38, 0.5),
+      0 0 70px rgba(220, 38, 38, 0.35);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    font-style: italic;
+    position: relative;
+  }
+
+  /* === ST LOGO-STYLE TITLE BLOCK (with bars) === */
+  .st-logo-text {
+    font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+    font-weight: 700;
+    font-style: italic;
+    font-size: clamp(2.6rem, 7vw, 5.6rem);
+    line-height: 0.9;
+    text-align: center;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--upside-red);
+    text-stroke: 2px var(--upside-red);
+    text-shadow:
+      0 0 10px rgba(220, 38, 38, 0.9),
+      0 0 22px rgba(220, 38, 38, 0.7),
+      0 0 45px rgba(220, 38, 38, 0.5),
+      0 0 80px rgba(220, 38, 38, 0.35);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    position: relative;
+    padding: 18px 8px;
+    display: inline-block;
+  }
+  .st-logo-text::before,
+  .st-logo-text::after {
+    content: '';
+    position: absolute;
+    left: -2%;
+    right: -2%;
+    height: 4px;
+    background: var(--upside-red);
+    box-shadow: 0 0 14px rgba(220, 38, 38, 0.85), 0 0 28px rgba(220, 38, 38, 0.55);
+  }
+  .st-logo-text::before { top: 0; }
+  .st-logo-text::after { bottom: 0; }
+  .st-logo-text .line2 {
+    display: block;
+    margin-top: 0.1em;
+  }
+  h1.flipped {
+    transform: rotate(180deg);
+    color: var(--upside-red);
+  }
+  h2 {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.7rem, 3.8vw, 3.2rem);
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 2vh;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+  }
+  h2 .red-glow {
+    color: var(--upside-red);
+    text-shadow: 0 0 24px rgba(220,38,38,0.7);
+  }
+  h2 .blue-glow {
+    color: var(--hawkins-blue-light);
+    text-shadow: 0 0 24px rgba(59,130,246,0.7);
+  }
+  h2 .yellow-glow {
+    color: var(--hawkins-yellow);
+    text-shadow: 0 0 24px rgba(251,191,36,0.7);
+  }
+  h2 .purple-glow {
+    color: var(--eleven-purple);
+    text-shadow: 0 0 24px rgba(139,92,246,0.7);
+  }
+  h3 {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.2rem, 2.4vw, 2rem);
+    color: var(--text);
+    margin: 1vh 0;
+  }
+  p, li {
+    font-size: clamp(1.05rem, 1.9vw, 1.55rem);
+    line-height: 1.5;
+    color: var(--text);
+    font-weight: 400;
+  }
+  .big {
+    font-size: clamp(1.3rem, 2.4vw, 2rem);
+    font-weight: 500;
+  }
+  .caveat {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+  }
+  .retro {
+    font-family: 'VT323', monospace;
+    letter-spacing: 1px;
+  }
+  ul { list-style: none; }
+
+  /* === TOP BAR === */
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 14px 22px;
+    pointer-events: none;
+  }
+  .brand {
+    background: rgba(10, 10, 20, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 6px 16px 6px 8px;
+    border-radius: 30px;
+    font-family: 'VT323', monospace;
+    color: var(--upside-red);
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(220,38,38,0.4);
+    letter-spacing: 1px;
+  }
+  .brand-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--upside-red);
+    box-shadow: 0 0 14px var(--upside-red), 0 0 24px var(--upside-red);
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.85); }
+  }
+  .progress {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 3px;
+    margin: 0 18px;
+    overflow: hidden;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--upside-red) 0%, var(--eleven-purple) 50%, var(--hawkins-blue-light) 100%);
+    width: 0;
+    transition: width .7s cubic-bezier(.16,1,.3,1);
+    border-radius: 3px;
+    box-shadow: 0 0 14px rgba(220,38,38,0.6);
+  }
+  .hint {
+    background: rgba(10, 10, 20, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.08);
+    font-family: 'VT323', monospace;
+    letter-spacing: 1px;
+  }
+  .hint kbd {
+    background: var(--upside-red);
+    color: white;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin: 0 2px;
+    font-family: 'VT323', monospace;
+    box-shadow: 0 0 8px rgba(220,38,38,0.5);
+  }
+
+  /* Music toggle button (small + subtle, intro handles main start) */
+  .music-btn {
+    pointer-events: auto;
+    background: rgba(10, 10, 20, 0.78);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 6px 14px;
+    border-radius: 18px;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.1);
+    font-family: 'VT323', monospace;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    border: 0;
+    margin-right: 10px;
+    transition: all 0.25s;
+  }
+  .music-btn:hover {
+    color: var(--hawkins-yellow);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(251,191,36,0.4);
+  }
+  .music-btn.playing {
+    color: var(--hawkins-yellow);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 14px rgba(251,191,36,0.4), inset 0 0 0 1px rgba(251,191,36,0.5);
+    animation: musicPulse 2s ease-in-out infinite;
+  }
+  @keyframes musicPulse {
+    0%, 100% { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 14px rgba(251,191,36,0.35), inset 0 0 0 1px rgba(251,191,36,0.45); }
+    50%      { box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 0 24px rgba(251,191,36,0.65), inset 0 0 0 1px rgba(251,191,36,0.75); }
+  }
+
+  /* === INTRO SPLASH === */
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: radial-gradient(ellipse at center, #14142b 0%, #0a0a14 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3vh;
+    padding: 5vh 5vw;
+    overflow: hidden;
+    transition: opacity 1.2s ease, transform 1.2s ease;
+  }
+  .intro.hide {
+    opacity: 0;
+    transform: scale(1.1);
+    pointer-events: none;
+  }
+  .intro::before {
+    /* CRT scan lines on intro */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.12) 0px, rgba(0,0,0,0.12) 2px, transparent 2px, transparent 4px);
+    pointer-events: none;
+    mix-blend-mode: multiply;
+  }
+  .intro::after {
+    /* vignette */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+  }
+  /* Intro title — huge, zoom out over 40s */
+  .intro .st-logo-text {
+    visibility: hidden;
+    z-index: 2;
+    font-size: clamp(3.5rem, 10vw, 8rem);
+    line-height: 0.95;
+    transform-origin: center center;
+    will-change: transform, opacity;
+  }
+  .intro.revealing .st-logo-text {
+    visibility: visible;
+    animation: stZoomCinema 40s cubic-bezier(.45, .05, .55, 1) forwards;
+  }
+  @keyframes stZoomCinema {
+    0%   { opacity: 0; transform: scale(6); filter: blur(8px) brightness(1.3); }
+    8%   { opacity: 1; filter: blur(2px) brightness(1.15); }
+    25%  { transform: scale(4); filter: blur(0.5px) brightness(1.05); }
+    100% { opacity: 1; transform: scale(1); filter: blur(0) brightness(1); }
+  }
+
+  /* Individual letters: just style, no per-letter animation */
+  .st-letter {
+    display: inline-block;
+    opacity: 1;
+    color: transparent;
+    -webkit-text-stroke: 2px var(--upside-red);
+    text-stroke: 2px var(--upside-red);
+    font-family: 'Playfair Display', 'Cormorant Garamond', 'Times New Roman', serif;
+    font-weight: 900;
+    font-style: italic;
+    text-transform: uppercase;
+    text-shadow:
+      0 0 10px rgba(220, 38, 38, 0.95),
+      0 0 22px rgba(220, 38, 38, 0.75),
+      0 0 50px rgba(220, 38, 38, 0.4);
+  }
+  .intro .st-letter.space-letter { width: 0.3em; }
+
+  /* Lines container */
+  .intro-line {
+    display: block;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .intro-line.line-2 .st-letter {
+    display: inline-block;
+    transform-origin: center center;
+  }
+  .intro-line.line-2 {
+    transform: rotate(180deg);
+    direction: rtl;
+  }
+
+  /* Subtitle + foot: hidden until letters revealed */
+  .intro-sub, .intro-foot {
+    visibility: hidden;
+    z-index: 2;
+  }
+  .intro.revealed .intro-sub,
+  .intro.revealed .intro-foot {
+    visibility: visible;
+    animation: introSubIn 1.3s cubic-bezier(.16, 1, .3, 1) forwards;
+  }
+  .intro-sub {
+    font-family: 'DM Serif Display', 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: clamp(1.2rem, 2.4vw, 2rem);
+    color: var(--hawkins-yellow);
+    text-align: center;
+    margin-top: 1.5vh;
+    letter-spacing: 1px;
+    line-height: 1.3;
+  }
+  .intro-sub .dot {
+    display: inline-block;
+    margin: 0 0.6em;
+    color: var(--upside-red);
+    transform: translateY(-0.05em);
+    font-style: normal;
+  }
+  @keyframes introSubIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .intro-foot {
+    position: absolute;
+    bottom: 22px;
+    left: 0; right: 0;
+    text-align: center;
+    color: var(--text-dim);
+    font-family: 'VT323', monospace;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+  }
+
+  /* Start button — visible until clicked */
+  .intro-btn {
+    font-family: 'VT323', monospace;
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, var(--upside-red), var(--eleven-purple-deep));
+    color: var(--hawkins-yellow);
+    border: 2px solid var(--hawkins-yellow);
+    padding: 14px 36px;
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 14px 32px rgba(220, 38, 38, 0.5), 0 0 30px rgba(220, 38, 38, 0.4);
+    transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s;
+    animation: btnPulse 2.4s ease-in-out infinite;
+    z-index: 3;
+  }
+  .intro-btn:hover {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow: 0 20px 44px rgba(220, 38, 38, 0.7), 0 0 50px rgba(220, 38, 38, 0.55);
+  }
+  .intro.revealing .intro-btn {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.9);
+  }
+  @keyframes btnPulse {
+    0%, 100% { box-shadow: 0 14px 32px rgba(220, 38, 38, 0.5), 0 0 30px rgba(220, 38, 38, 0.4); }
+    50%      { box-shadow: 0 18px 40px rgba(220, 38, 38, 0.7), 0 0 50px rgba(220, 38, 38, 0.65); }
+  }
+
+  /* Initial cinematic hint shown before click */
+  .intro-prompt {
+    color: var(--text-dim);
+    font-family: 'VT323', monospace;
+    letter-spacing: 3px;
+    font-size: 0.95rem;
+    text-align: center;
+    margin-top: 0.5vh;
+    z-index: 3;
+    animation: promptFade 2s ease-in-out infinite;
+  }
+  .intro.revealing .intro-prompt { display: none; }
+  @keyframes promptFade {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
+  }
+
+  /* Skip link in corner */
+  .intro-skip {
+    position: absolute;
+    top: 24px;
+    right: 28px;
+    color: var(--text-dim);
+    font-family: 'VT323', monospace;
+    letter-spacing: 2px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    z-index: 3;
+    background: none;
+    border: 0;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+  .intro.revealing .intro-skip {
+    opacity: 0.6;
+    pointer-events: auto;
+  }
+  .intro-skip:hover { opacity: 1; color: var(--hawkins-yellow); }
+
+  /* === COUNTER (in topbar) === */
+  .counter {
+    pointer-events: auto;
+    font-family: 'VT323', monospace;
+    color: var(--hawkins-yellow);
+    background: rgba(10, 10, 20, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    min-width: 72px;
+    text-align: center;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(251,191,36,0.35);
+    margin-right: 10px;
+  }
+
+  /* === TAP ZONES (left/right halves of screen) === */
+  .tap-zone {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 30vw;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    z-index: 70;
+    opacity: 0;
+    transition: opacity 0.3s, background 0.3s;
+  }
+  .tap-zone.tap-prev { left: 0; }
+  .tap-zone.tap-next { right: 0; }
+  .tap-zone:hover:not(.disabled) {
+    opacity: 1;
+    background: linear-gradient(90deg, rgba(220, 38, 38, 0.08), transparent);
+  }
+  .tap-zone.tap-next:hover:not(.disabled) {
+    background: linear-gradient(270deg, rgba(220, 38, 38, 0.08), transparent);
+  }
+  .tap-zone.disabled { cursor: default; pointer-events: none; }
+
+  /* On-hover hint arrows */
+  .tap-zone::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 38px;
+    height: 38px;
+    transform: translateY(-50%) rotate(45deg);
+    border: 3px solid var(--hawkins-yellow);
+    border-top: 0;
+    border-left: 0;
+    opacity: 0;
+    transition: opacity 0.3s;
+    filter: drop-shadow(0 0 12px rgba(251,191,36,0.6));
+  }
+  .tap-zone.tap-prev::before {
+    left: 22px;
+    transform: translateY(-50%) rotate(135deg);
+  }
+  .tap-zone.tap-next::before {
+    right: 22px;
+  }
+  .tap-zone:hover:not(.disabled)::before { opacity: 0.9; }
+
+  /* === MASCOT === */
+  .mascot-svg {
+    width: clamp(150px, 22vw, 280px);
+    height: auto;
+    animation: bob 4s ease-in-out infinite;
+    filter: drop-shadow(0 18px 32px rgba(220,38,38,0.35)) drop-shadow(0 0 24px rgba(139,92,246,0.25));
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-18px) rotate(2deg); }
+  }
+  .eye-blink {
+    animation: blink 5s infinite;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  @keyframes blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    95% { transform: scaleY(0.1); }
+  }
+
+  /* === DEMOGORGON, VECNA, MIND FLAYER ICONS === */
+  .monster {
+    width: clamp(140px, 18vw, 220px);
+    height: auto;
+    filter: drop-shadow(0 0 40px rgba(220,38,38,0.6)) drop-shadow(0 0 20px rgba(139,92,246,0.4));
+    animation: monsterFloat 5s ease-in-out infinite;
+  }
+  @keyframes monsterFloat {
+    0%, 100% { transform: translateY(0) rotate(-1deg) scale(1); }
+    50% { transform: translateY(-12px) rotate(1deg) scale(1.04); }
+  }
+
+  /* === SPEECH BUBBLE / WALKIE-TALKIE === */
+  .speech {
+    background: rgba(20, 20, 43, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: var(--text);
+    padding: 24px 30px;
+    border-radius: var(--radius-lg);
+    max-width: 70vw;
+    position: relative;
+    margin: 1vh 0;
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.08);
+    font-size: clamp(1.1rem, 2.1vw, 1.7rem);
+    font-weight: 400;
+  }
+  .speech.big-quote {
+    font-size: clamp(1.2rem, 2.4vw, 2rem);
+    line-height: 1.45;
+    text-align: center;
+  }
+  .speech.walkie {
+    border: 2px dashed var(--hawkins-yellow);
+    box-shadow: 0 0 30px rgba(251,191,36,0.3), inset 0 0 0 1px rgba(251,191,36,0.2);
+    position: relative;
+  }
+  .speech.walkie::before {
+    content: '📻';
+    position: absolute;
+    top: -22px;
+    left: 30px;
+    font-size: 2rem;
+    background: var(--bg-mid);
+    padding: 4px 12px;
+    border-radius: 16px;
+    box-shadow: 0 0 16px rgba(251,191,36,0.4);
+  }
+
+  /* === CARDS === */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    width: 92%;
+    max-width: 1250px;
+    margin-top: 2vh;
+  }
+  .card {
+    background: rgba(20, 20, 43, 0.78);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius);
+    padding: 22px 18px;
+    text-align: center;
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.06);
+    transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s;
+    animation: popIn .6s cubic-bezier(.16,1,.3,1) backwards;
+  }
+  .card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 22px 50px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.12);
+  }
+  .card .icon {
+    font-size: 2.6rem;
+    display: block;
+    margin-bottom: 10px;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+  }
+  .card strong {
+    font-weight: 600;
+    color: var(--text);
+    font-size: clamp(1rem, 1.7vw, 1.3rem);
+  }
+  .card p {
+    font-size: clamp(.85rem, 1.4vw, 1.05rem);
+    margin-top: 4px;
+    color: var(--text-dim);
+  }
+  .card.bad { border-top: 4px solid var(--upside-red); box-shadow: 0 20px 40px rgba(220,38,38,0.2), inset 0 0 0 1px rgba(220,38,38,0.2); }
+  .card.good { border-top: 4px solid var(--green-glow); box-shadow: 0 20px 40px rgba(16,185,129,0.2), inset 0 0 0 1px rgba(16,185,129,0.2); }
+  .card.warn { border-top: 4px solid var(--hawkins-yellow); box-shadow: 0 20px 40px rgba(251,191,36,0.2), inset 0 0 0 1px rgba(251,191,36,0.2); }
+
+  .grid .card:nth-child(1) { animation-delay: 0.05s; }
+  .grid .card:nth-child(2) { animation-delay: 0.12s; }
+  .grid .card:nth-child(3) { animation-delay: 0.19s; }
+  .grid .card:nth-child(4) { animation-delay: 0.26s; }
+  .grid .card:nth-child(5) { animation-delay: 0.33s; }
+  .grid .card:nth-child(6) { animation-delay: 0.40s; }
+  @keyframes popIn {
+    0% { transform: scale(.7) translateY(20px); opacity: 0; }
+    70% { transform: scale(1.04); }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  /* === STORY CARDS (Adorni lab files) === */
+  .story {
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 6px;
+    padding: 32px 36px;
+    max-width: 980px;
+    width: 92%;
+    box-shadow: var(--shadow), 0 0 0 1px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0, transparent 36px, rgba(40,60,100,0.15) 36px, rgba(40,60,100,0.15) 37px),
+      linear-gradient(135deg, var(--paper) 0%, #ead8a6 100%);
+    background-size: 100% auto, auto;
+    transform: rotate(-0.5deg);
+    border-left: 4px solid var(--upside-red);
+  }
+  .story::before {
+    content: 'FILE CASO';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--upside-red);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 0;
+    font-family: 'VT323', monospace;
+    letter-spacing: 2px;
+    font-size: 0.85rem;
+    transform: rotate(2deg);
+    box-shadow: 0 4px 12px rgba(220,38,38,0.4);
+  }
+  .story::after {
+    content: 'CONFIDENZIALE';
+    position: absolute;
+    bottom: 18px;
+    right: 24px;
+    color: rgba(220,38,38,0.18);
+    font-family: 'VT323', monospace;
+    font-size: 2.2rem;
+    letter-spacing: 4px;
+    transform: rotate(-12deg);
+    pointer-events: none;
+  }
+  .story-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+    color: var(--ink);
+    font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+    font-weight: 600;
+    position: relative;
+  }
+  .story-badge {
+    background: var(--ink);
+    color: var(--hawkins-yellow);
+    padding: 5px 16px;
+    border-radius: 4px;
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    font-family: 'VT323', monospace;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .story p {
+    margin-bottom: 12px;
+    position: relative;
+    color: var(--ink);
+  }
+  .story .lesson {
+    background: rgba(220, 38, 38, 0.12);
+    padding: 18px 22px;
+    border-radius: 4px;
+    margin-top: 18px;
+    font-weight: 500;
+    border-left: 6px solid var(--upside-red);
+    color: var(--ink);
+  }
+
+  /* === QUIZ === */
+  .quiz-question {
+    background: rgba(20, 20, 43, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: var(--radius-lg);
+    padding: 32px 36px;
+    max-width: 920px;
+    width: 92%;
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.08);
+    text-align: center;
+  }
+  .quiz-question h3 {
+    color: var(--text);
+    margin-bottom: 22px;
+    font-size: clamp(1.25rem, 2.6vw, 2rem);
+    font-weight: 600;
+  }
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  @media (min-width: 700px) {
+    .quiz-options { grid-template-columns: 1fr 1fr; }
+  }
+  .quiz-option {
+    background: rgba(31, 37, 71, 0.9);
+    color: var(--text);
+    border: 2px solid rgba(255,255,255,0.08);
+    padding: 18px 20px;
+    font-size: clamp(1rem, 1.7vw, 1.3rem);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all .25s cubic-bezier(.16,1,.3,1);
+    font-family: inherit;
+    font-weight: 500;
+    text-align: left;
+  }
+  .quiz-option:hover:not(:disabled) {
+    transform: translateY(-3px);
+    border-color: var(--hawkins-yellow);
+    box-shadow: 0 10px 24px rgba(251,191,36,0.22);
+    background: rgba(31, 37, 71, 1);
+  }
+  .quiz-option.correct {
+    background: linear-gradient(135deg, var(--green-glow) 0%, #047857 100%);
+    color: white;
+    border-color: var(--green-glow);
+    animation: jump .6s cubic-bezier(.36,1.6,.6,1);
+    box-shadow: 0 10px 28px rgba(16,185,129,0.5);
+  }
+  .quiz-option.wrong {
+    background: linear-gradient(135deg, var(--upside-red) 0%, var(--upside-red-deep) 100%);
+    color: white;
+    border-color: var(--upside-red);
+    animation: shake .5s;
+    box-shadow: 0 10px 28px rgba(220,38,38,0.5);
+  }
+  .quiz-option:disabled { cursor: default; }
+  @keyframes jump {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.1) translateY(-6px); }
+    100% { transform: scale(1) translateY(-3px); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+  }
+  .quiz-feedback {
+    margin-top: 20px;
+    padding: 18px 22px;
+    border-radius: var(--radius);
+    font-size: clamp(1rem, 1.9vw, 1.3rem);
+    display: none;
+    text-align: left;
+  }
+  .quiz-feedback.show { display: block; animation: popIn .5s cubic-bezier(.16,1,.3,1); }
+  .quiz-feedback.ok {
+    background: rgba(16, 185, 129, 0.18);
+    color: var(--text);
+    border: 2px solid var(--green-glow);
+    box-shadow: 0 0 24px rgba(16,185,129,0.25);
+  }
+  .quiz-feedback.ko {
+    background: rgba(220, 38, 38, 0.18);
+    color: var(--text);
+    border: 2px solid var(--upside-red);
+    box-shadow: 0 0 24px rgba(220,38,38,0.25);
+  }
+
+  /* === RULES (Codici dell'Adorni) === */
+  .rules {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    width: 96%;
+    max-width: 1400px;
+  }
+  .rule {
+    background: rgba(20, 20, 43, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius);
+    padding: 22px 22px 22px 26px;
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.06);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: transform .3s, box-shadow .3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .rule::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 6px;
+  }
+  .rule:hover { transform: translateY(-4px); }
+  .rule:nth-child(1)::before { background: var(--upside-red); box-shadow: 0 0 12px var(--upside-red); }
+  .rule:nth-child(2)::before { background: var(--eleven-purple); box-shadow: 0 0 12px var(--eleven-purple); }
+  .rule:nth-child(3)::before { background: var(--upside-pink); box-shadow: 0 0 12px var(--upside-pink); }
+  .rule:nth-child(4)::before { background: var(--green-glow); box-shadow: 0 0 12px var(--green-glow); }
+  .rule:nth-child(5)::before { background: var(--hawkins-yellow); box-shadow: 0 0 12px var(--hawkins-yellow); }
+  .rule .num {
+    font-family: 'Bowlby One', sans-serif;
+    font-size: 2.8rem;
+    line-height: 1;
+    min-width: 40px;
+    color: var(--upside-red);
+    text-shadow: 0 0 14px rgba(220,38,38,0.5);
+  }
+  .rule:nth-child(2) .num { color: var(--eleven-purple); text-shadow: 0 0 14px rgba(139,92,246,0.5); }
+  .rule:nth-child(3) .num { color: var(--upside-pink); text-shadow: 0 0 14px rgba(236,72,153,0.5); }
+  .rule:nth-child(4) .num { color: var(--green-glow); text-shadow: 0 0 14px rgba(16,185,129,0.5); }
+  .rule:nth-child(5) .num { color: var(--hawkins-yellow); text-shadow: 0 0 14px rgba(251,191,36,0.5); }
+  .rule strong {
+    display: block;
+    font-size: clamp(1.05rem, 1.7vw, 1.35rem);
+    color: var(--text);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .rule p {
+    font-size: clamp(.9rem, 1.3vw, 1.1rem);
+    color: var(--text-dim);
+    line-height: 1.45;
+  }
+
+  /* === TITLE SLIDE === */
+  .title-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2vh;
+  }
+  .subtitle {
+    font-size: clamp(1.1rem, 2.2vw, 1.7rem);
+    color: var(--text-dim);
+    text-align: center;
+    font-weight: 400;
+  }
+  .subtitle .caveat { font-size: 1.25em; color: var(--hawkins-yellow); }
+  .age-badge {
+    background: rgba(251,191,36,0.15);
+    color: var(--hawkins-yellow);
+    padding: 8px 22px;
+    border-radius: 24px;
+    font-weight: 500;
+    font-size: 1rem;
+    border: 1px dashed var(--hawkins-yellow);
+    box-shadow: 0 0 20px rgba(251,191,36,0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* === CHAPTER PILL === */
+  .chapter {
+    background: rgba(20, 20, 43, 0.7);
+    color: var(--hawkins-yellow);
+    padding: 8px 22px;
+    border-radius: 30px;
+    font-size: clamp(.85rem, 1.5vw, 1.05rem);
+    margin-bottom: 1.5vh;
+    font-family: 'VT323', monospace;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    border: 1px solid rgba(251,191,36,0.4);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .chapter.red { color: var(--upside-red); border-color: rgba(220,38,38,0.5); box-shadow: 0 0 20px rgba(220,38,38,0.3); }
+  .chapter.purple { color: var(--eleven-purple); border-color: rgba(139,92,246,0.5); box-shadow: 0 0 20px rgba(139,92,246,0.3); }
+  .chapter.green { color: var(--green-glow); border-color: rgba(16,185,129,0.5); box-shadow: 0 0 20px rgba(16,185,129,0.3); }
+  .chapter.blue { color: var(--hawkins-blue-light); border-color: rgba(59,130,246,0.5); box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+
+  /* === ADORNI / SOTTOSOPRA SPLIT === */
+  .split {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 22px;
+    align-items: stretch;
+    width: 95%;
+    max-width: 1300px;
+    margin-top: 2vh;
+  }
+  .split-col {
+    background: rgba(20, 20, 43, 0.78);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius-lg);
+    padding: 26px;
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+  .split-col::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+  }
+  .split-col.hawkins::before { background: linear-gradient(90deg, var(--hawkins-blue-light), var(--hawkins-yellow)); box-shadow: 0 0 16px rgba(251,191,36,0.5); }
+  .split-col.sottosopra::before { background: linear-gradient(90deg, var(--upside-red), var(--eleven-purple)); box-shadow: 0 0 16px rgba(220,38,38,0.5); }
+  .split-col h3 { text-align: center; margin-top: 6px; }
+  .split-col.hawkins h3 { color: var(--hawkins-yellow); }
+  .split-col.sottosopra h3 { color: var(--upside-red); }
+  .split-col ul { margin-top: 14px; }
+  .split-col li {
+    padding: 10px 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.08);
+    font-size: clamp(.95rem, 1.55vw, 1.2rem);
+    color: var(--text);
+  }
+  .split-col li:last-child { border-bottom: none; }
+  .split-vs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--hawkins-yellow);
+    font-family: 'Bowlby One', sans-serif;
+    font-size: 2.5rem;
+    text-shadow: 0 0 20px rgba(251,191,36,0.6);
+    transform: rotate(-5deg);
+  }
+  @media (max-width: 900px) {
+    .split { grid-template-columns: 1fr; }
+    .split-vs { transform: rotate(0deg); }
+  }
+
+  /* === SCAM === */
+  .scam-box {
+    background: linear-gradient(135deg, var(--upside-red), var(--upside-red-deep));
+    color: white;
+    padding: 20px 28px;
+    border-radius: var(--radius);
+    font-size: clamp(1.15rem, 2.2vw, 1.75rem);
+    text-align: center;
+    box-shadow: 0 14px 30px rgba(220,38,38,0.5), 0 0 40px rgba(220,38,38,0.3);
+    margin: 1.4vh 0;
+    animation: pulseScam 2.4s ease-in-out infinite;
+    max-width: 85%;
+    font-weight: 600;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .scam-box::after {
+    content: '🌀';
+    position: absolute;
+    top: -18px;
+    right: -10px;
+    font-size: 2rem;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));
+    animation: spinSlow 4s linear infinite;
+  }
+  @keyframes spinSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes pulseScam {
+    0%,100% { transform: scale(1); box-shadow: 0 14px 30px rgba(220,38,38,0.5), 0 0 40px rgba(220,38,38,0.3); }
+    50% { transform: scale(1.03); box-shadow: 0 20px 40px rgba(220,38,38,0.7), 0 0 60px rgba(220,38,38,0.5); }
+  }
+
+  /* === REFLECTION SLIDE (Diario / Notebook) === */
+  .diary {
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 4px;
+    padding: 38px 46px;
+    max-width: 1000px;
+    width: 92%;
+    box-shadow: var(--shadow), 0 0 0 1px rgba(0,0,0,0.1);
+    position: relative;
+    background-image:
+      repeating-linear-gradient(0deg, transparent 0, transparent 36px, rgba(40,60,100,0.18) 36px, rgba(40,60,100,0.18) 37px),
+      linear-gradient(135deg, var(--paper) 0%, #ecdcb0 100%);
+    transform: rotate(0.3deg);
+    border-left: 8px solid var(--hawkins-yellow);
+  }
+  .diary::before {
+    content: '★ DIARIO DEL CLUB ★';
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: var(--hawkins-yellow);
+    padding: 6px 18px;
+    border-radius: 4px;
+    font-family: 'VT323', monospace;
+    letter-spacing: 3px;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  }
+  .diary h2 {
+    font-family: 'Caveat', cursive;
+    font-weight: 700;
+    color: var(--ink);
+    text-align: left;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.05;
+    margin-top: 8px;
+    margin-bottom: 12px;
+    letter-spacing: 0;
+  }
+  .diary p, .diary li {
+    color: var(--ink);
+    font-family: 'Caveat', cursive;
+    font-weight: 600;
+    font-size: clamp(1.25rem, 2.4vw, 1.9rem);
+    line-height: 1.4;
+  }
+  .diary .prompts { margin-top: 12px; }
+  .diary .prompts li {
+    padding: 6px 0 6px 30px;
+    position: relative;
+  }
+  .diary .prompts li::before {
+    content: '✎';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    color: var(--upside-red);
+    font-size: 1.2em;
+  }
+  .diary .meta {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .diary .timer {
+    background: var(--ink);
+    color: var(--hawkins-yellow);
+    padding: 4px 14px;
+    border-radius: 4px;
+    font-family: 'VT323', monospace;
+    letter-spacing: 1.5px;
+    font-size: 0.95rem;
+  }
+  .diary .badge-discuss {
+    background: var(--upside-red);
+    color: white;
+    padding: 4px 14px;
+    border-radius: 4px;
+    font-family: 'VT323', monospace;
+    letter-spacing: 1.5px;
+    font-size: 0.95rem;
+  }
+  .reveal-btn {
+    background: var(--ink);
+    color: var(--hawkins-yellow);
+    border: 2px dashed var(--ink);
+    padding: 10px 22px;
+    margin-top: 14px;
+    border-radius: 4px;
+    font-family: 'VT323', monospace;
+    letter-spacing: 2px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all .25s;
+  }
+  .reveal-btn:hover {
+    background: var(--upside-red);
+    color: white;
+    border-color: var(--upside-red);
+  }
+  .reveal-content {
+    display: none;
+    margin-top: 14px;
+    padding: 14px 18px;
+    background: rgba(220,38,38,0.08);
+    border-left: 4px solid var(--upside-red);
+    border-radius: 4px;
+    animation: popIn .4s;
+  }
+  .reveal-content.show { display: block; }
+  .reveal-content .label {
+    display: block;
+    font-family: 'VT323', monospace;
+    letter-spacing: 1.5px;
+    color: var(--upside-red);
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+  .reveal-content p, .reveal-content li {
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 400;
+    font-size: clamp(.95rem, 1.55vw, 1.2rem);
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: 4px;
+  }
+  .reveal-content ul {
+    padding-left: 18px;
+    list-style: disc;
+  }
+
+  /* === PLEDGE === */
+  .pledge {
+    background: rgba(20, 20, 43, 0.88);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: var(--radius-lg);
+    padding: 36px 40px;
+    max-width: 920px;
+    width: 92%;
+    box-shadow: var(--shadow), 0 0 40px rgba(139,92,246,0.3);
+    border: 3px dashed var(--eleven-purple);
+    text-align: center;
+    position: relative;
+  }
+  .pledge::before {
+    content: '⚡';
+    position: absolute;
+    top: -28px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-mid);
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 30px rgba(139,92,246,0.6);
+    border: 2px solid var(--eleven-purple);
+    color: var(--hawkins-yellow);
+  }
+  .pledge h2 {
+    color: var(--text);
+    margin-top: 10px;
+  }
+  .pledge ul {
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto 1vh;
+    font-size: clamp(1rem, 1.7vw, 1.3rem);
+  }
+  .pledge ul li {
+    padding: 8px 0;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* === CTA BUTTON === */
+  .cta {
+    background: linear-gradient(135deg, var(--upside-red), var(--eleven-purple-deep));
+    border: 2px solid var(--hawkins-yellow);
+    padding: 16px 38px;
+    border-radius: 40px;
+    font-size: clamp(1rem, 1.8vw, 1.4rem);
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 14px 32px rgba(220,38,38,0.5), 0 0 28px rgba(220,38,38,0.3);
+    margin-top: 2vh;
+    font-family: 'VT323', monospace;
+    letter-spacing: 2px;
+    color: var(--hawkins-yellow);
+    transition: all .3s cubic-bezier(.16,1,.3,1);
+    text-transform: uppercase;
+  }
+  .cta:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 20px 44px rgba(220,38,38,0.7), 0 0 40px rgba(220,38,38,0.5);
+  }
+
+  /* === CONFETTI === */
+  .confetti-piece {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -20px;
+    z-index: 200;
+    pointer-events: none;
+  }
+
+  /* === HELPERS === */
+  .row { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; justify-content: center; }
+  .center { text-align: center; }
+  .mt-2 { margin-top: 2vh; }
+  .max-w-1000 { max-width: 1000px; width: 90%; }
+  .max-w-900 { max-width: 900px; width: 90%; }
+  .glow-red { color: var(--upside-red); text-shadow: 0 0 20px rgba(220,38,38,0.6); }
+  .glow-yellow { color: var(--hawkins-yellow); text-shadow: 0 0 20px rgba(251,191,36,0.6); }
+
+  /* === UPSIDE DOWN FLIP === */
+  .flip {
+    display: inline-block;
+    transform: rotate(180deg);
+  }
+
+  /* === CRT SCAN LINES (subtle TV effect) === */
+  .crt-lines {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.08) 0px,
+      rgba(0, 0, 0, 0.08) 1.5px,
+      transparent 1.5px,
+      transparent 4px
+    );
+    mix-blend-mode: multiply;
+    opacity: 0.55;
+  }
+  .crt-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 81;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.45) 100%);
+    mix-blend-mode: multiply;
+    opacity: 0.7;
+  }
+
+  /* === VHS GLITCH OVERLAY (slide transitions) === */
+  .glitch-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    background:
+      repeating-linear-gradient(0deg,
+        rgba(255, 255, 255, 0.04) 0px,
+        rgba(255, 255, 255, 0.04) 1px,
+        transparent 1px,
+        transparent 3px),
+      linear-gradient(90deg, rgba(220, 38, 38, 0.18) 0%, transparent 30%, transparent 70%, rgba(59, 130, 246, 0.18) 100%);
+    mix-blend-mode: screen;
+  }
+  .glitch-overlay.active { animation: vhsGlitch 0.6s steps(8, end) forwards; }
+  @keyframes vhsGlitch {
+    0%   { opacity: 0; transform: scaleX(1) translateY(0); filter: hue-rotate(0deg); }
+    10%  { opacity: 1; transform: scaleX(1.01) translateY(-3px); filter: hue-rotate(20deg); }
+    20%  { opacity: 0.6; transform: scaleX(0.998) translateY(2px); filter: hue-rotate(-30deg); }
+    30%  { opacity: 1; transform: scaleX(1.005) translateY(-2px); filter: hue-rotate(15deg); }
+    45%  { opacity: 0.7; transform: scaleX(0.995) translateY(1px); filter: hue-rotate(-10deg); }
+    65%  { opacity: 0.5; transform: scaleX(1.002) translateY(0); }
+    100% { opacity: 0; transform: scaleX(1) translateY(0); filter: none; }
+  }
+
+  /* Tracking distortion bar sweep */
+  .tracking-bar {
+    position: fixed;
+    left: 0; right: 0;
+    height: 22px;
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.2) 30%,
+      rgba(255, 255, 255, 0.35) 50%,
+      rgba(255, 255, 255, 0.2) 70%,
+      transparent 100%);
+    mix-blend-mode: screen;
+    opacity: 0;
+    z-index: 9998;
+    pointer-events: none;
+    top: -30px;
+  }
+  .tracking-bar.active { animation: trackSweep 0.7s cubic-bezier(.2, .6, .8, .4) forwards; }
+  @keyframes trackSweep {
+    0%   { top: -30px; opacity: 0; }
+    18%  { opacity: 1; }
+    82%  { opacity: 1; }
+    100% { top: 110vh; opacity: 0; }
+  }
+
+  /* RGB shift on active slide content during transition */
+  .slide.glitching > * {
+    animation: rgbShift 0.45s steps(5, end);
+  }
+  @keyframes rgbShift {
+    0%   { text-shadow: none; }
+    20%  { text-shadow: -3px 0 #dc2626, 3px 0 #3b82f6; transform: translateX(2px); }
+    40%  { text-shadow: 3px 0 #dc2626, -3px 0 #3b82f6; transform: translateX(-2px); }
+    60%  { text-shadow: -2px 0 #ec4899, 2px 0 #10b981; transform: translateX(1px); }
+    80%  { text-shadow: 2px 0 #fbbf24, -2px 0 #8b5cf6; transform: translateX(0); }
+    100% { text-shadow: none; transform: translateX(0); }
+  }
+
+  /* Masking tape decorations for story/diary cards */
+  .story-tape {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-2deg);
+    width: 130px;
+    height: 26px;
+    background: rgba(251, 191, 36, 0.55);
+    border-left: 1px dashed rgba(0,0,0,0.15);
+    border-right: 1px dashed rgba(0,0,0,0.15);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    z-index: 3;
+  }
+  .diary-tape {
+    position: absolute;
+    top: -12px;
+    right: 36px;
+    width: 96px;
+    height: 22px;
+    background: rgba(220, 38, 38, 0.55);
+    transform: rotate(8deg);
+    border-left: 1px dashed rgba(0,0,0,0.15);
+    border-right: 1px dashed rgba(0,0,0,0.15);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    z-index: 3;
+  }
+  .diary-stamp {
+    position: absolute;
+    bottom: 22px;
+    right: 30px;
+    color: rgba(30, 58, 138, 0.32);
+    font-family: 'VT323', monospace;
+    font-size: 0.95rem;
+    letter-spacing: 2.5px;
+    transform: rotate(-8deg);
+    border: 2px solid rgba(30, 58, 138, 0.32);
+    padding: 4px 12px;
+    border-radius: 3px;
+    pointer-events: none;
+    text-align: center;
+    line-height: 1.1;
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="bg-flicker"></div>
+<div class="bg-ash" id="ashContainer"></div>
+
+<!-- CRT scanlines + vignette + glitch overlays -->
+<div class="crt-lines"></div>
+<div class="crt-vignette"></div>
+<div class="glitch-overlay" id="glitchOverlay"></div>
+<div class="tracking-bar" id="trackingBar"></div>
+
+<!-- Intro audio (mp3 placed in assets/) -->
+<audio id="introAudio" src="assets/intro.mp3" preload="auto" loop></audio>
+
+<!-- INTRO SPLASH -->
+<div class="intro" id="introScreen">
+  <button class="intro-skip" onclick="skipIntro()">SALTA INTRO ›</button>
+  <div class="st-logo-text" id="introTitle">
+    <span class="intro-line line-1" data-text="MISSIONE"></span>
+    <span class="intro-line line-2" data-text="SOTTOSOPRA"></span>
+  </div>
+  <div class="intro-sub">Sicurezza in internet <span class="dot">·</span> Il Club dell'Adorni</div>
+  <button class="intro-btn" onclick="enterClub()">⚡ ENTRA</button>
+  <div class="intro-prompt">Premi il pulsante per cominciare 📻</div>
+  <div class="intro-foot">Capitolo 1 · Adorni, 1985</div>
+</div>
+
+<!-- Christmas lights string (Joyce's wall) -->
+<div class="lights">
+  <svg viewBox="0 0 1600 90" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <!-- Wire (sagging) -->
+    <path d="M0,15 Q200,55 400,15 T800,15 T1200,15 T1600,15" stroke="#1a1d3a" stroke-width="2.5" fill="none" opacity="0.7"/>
+    <!-- Bulbs along the wire -->
+    <g id="bulbs"></g>
+  </svg>
+</div>
+
+<!-- Vines on edges -->
+<div class="vines left">
+  <svg viewBox="0 0 110 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin slice">
+    <defs>
+      <linearGradient id="vine-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#7f1d1d"/>
+        <stop offset="100%" stop-color="#3b0d0d"/>
+      </linearGradient>
+    </defs>
+    <!-- Main vine -->
+    <path d="M0 0 Q30 80 10 160 Q-10 240 25 320 Q50 400 15 480 Q-5 560 30 640 Q50 720 20 800"
+          stroke="url(#vine-grad)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <!-- Side branches -->
+    <path d="M15 100 Q40 110 55 95" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M20 220 Q45 230 65 210" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M22 340 Q50 350 70 330" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M18 460 Q45 470 60 450" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M28 580 Q55 590 75 570" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M22 700 Q50 710 65 690" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- Thorns/leaves -->
+    <circle cx="55" cy="95" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="65" cy="210" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="70" cy="330" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="60" cy="450" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="75" cy="570" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="65" cy="690" r="4" fill="#dc2626" opacity="0.6"/>
+  </svg>
+</div>
+<div class="vines right">
+  <svg viewBox="0 0 110 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin slice">
+    <path d="M0 0 Q30 80 10 160 Q-10 240 25 320 Q50 400 15 480 Q-5 560 30 640 Q50 720 20 800"
+          stroke="url(#vine-grad)" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M15 100 Q40 110 55 95" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M20 220 Q45 230 65 210" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M22 340 Q50 350 70 330" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M18 460 Q45 470 60 450" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M28 580 Q55 590 75 570" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M22 700 Q50 710 65 690" stroke="url(#vine-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <circle cx="55" cy="95" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="65" cy="210" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="70" cy="330" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="60" cy="450" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="75" cy="570" r="4" fill="#dc2626" opacity="0.6"/>
+    <circle cx="65" cy="690" r="4" fill="#dc2626" opacity="0.6"/>
+  </svg>
+</div>
+
+<div class="topbar">
+  <div class="brand"><div class="brand-dot"></div> CLUB · ADORNI</div>
+  <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
+  <button id="musicBtn" class="music-btn" onclick="toggleMusic()" title="Colonna sonora Sottosopra">🔇 MUSICA</button>
+  <div class="counter"><span id="cur">1</span> / <span id="tot">0</span></div>
+  <div class="hint">USA <kbd>←</kbd> <kbd>→</kbd></div>
+</div>
+
+<!-- Click zones for tap navigation (left/right halves of screen) -->
+<button class="tap-zone tap-prev" onclick="go(-1)" aria-label="Slide precedente"></button>
+<button class="tap-zone tap-next" onclick="go(1)" aria-label="Slide successiva"></button>
+
+<div class="stage" id="stage">
+
+  <!-- SLIDE 1: TITLE -->
+  <section class="slide active">
+    <div class="title-stack" style="gap: 1.5vh;">
+      <img src="assets/welcome_upside_down_red.svg" alt="Welcome to the Upside Down" class="st-art banner no-float">
+      <h1 style="font-size: clamp(2rem, 5vw, 4rem); letter-spacing: 4px;">MISSIONE <span class="flip" style="display:inline-block">SOTTOSOPRA</span></h1>
+      <div class="subtitle" style="margin-top: -0.5vh;"><span class="caveat">Sicurezza in internet</span> · Per il Club dell'Adorni</div>
+      <div class="age-badge">⚡ Solo per veri membri del Club · 9+ anni</div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2: WELCOME -->
+  <section class="slide">
+    <div class="chapter">Episodio 1 · La chiamata</div>
+    <h2>Ciao! Sono <span class="yellow-glow">DUSTIN</span></h2>
+    <div class="row mt-2" style="align-items: flex-end;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+        <img src="assets/dustin_yellow.svg" alt="Dustin - il nerd eroe" class="st-art large yellow-glow-art">
+        <div class="caveat" style="color: var(--hawkins-yellow); font-size: 1.5rem;">Dustin — il nerd eroe</div>
+      </div>
+      <div class="speech walkie" style="max-width: 520px;">
+        <b class="glow-yellow">PSSST… RADIO ACCESA!</b> 📻<br><br>
+        Come Mike, Lucas, Eleven e Will, oggi entrate in una <b>squadra</b>.<br>
+        Internet ha due lati: <b class="glow-yellow">Adorni</b> e il <b class="glow-red">Sottosopra</b>.<br><br>
+        I supereroi non sono i più forti. Sono i <b>più svegli</b>.<br>
+        Vi insegno a riconoscere i mostri <b>prima</b> che vi trovino. 🧠⚡
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 3: ADORNI vs SOTTOSOPRA -->
+  <section class="slide">
+    <div class="chapter">Episodio 2 · I due mondi</div>
+    <h2>Internet ha <span class="blue-glow">DUE LATI</span>, come Adorni</h2>
+    <div class="split">
+      <div class="split-col hawkins">
+        <h3>☀️ ADORNI</h3>
+        <ul>
+          <li>📚 Imparare cose nuove</li>
+          <li>🎮 Giocare con amici veri</li>
+          <li>🎨 Creare, disegnare, condividere</li>
+          <li>🤣 Ridere con video divertenti</li>
+          <li>👨‍👩‍👧 Sentire la famiglia lontana</li>
+        </ul>
+      </div>
+      <div class="split-vs" style="flex-direction:column; gap:14px;"><img src="assets/hawkins_upside_down_red.svg" alt="Adorni vs Sottosopra" class="st-art small no-float" style="margin-bottom:8px;"><span class="flip">VS</span></div>
+      <div class="split-col sottosopra">
+        <h3>🔴 SOTTOSOPRA</h3>
+        <ul>
+          <li>👹 Demogorgoni che fingono di essere amici</li>
+          <li>🌀 Trappole che rubano i tuoi Eggos</li>
+          <li>💀 Vecna che ti ferisce con parole</li>
+          <li>🦇 Mind Flayer delle sfide pericolose</li>
+          <li>🕸️ Vigne che ti tirano dentro</li>
+        </ul>
+      </div>
+    </div>
+    <p class="big center" style="margin-top:2vh;">Il problema? <span class="glow-red">I due mondi sembrano IDENTICI.</span><br><span style="font-size:0.7em; color: var(--text-dim);" class="caveat">È così che <b>Will</b> è stato trascinato nel Sottosopra senza accorgersene.</span></p>
+  </section>
+
+  <!-- SLIDE 4: WHERE -->
+  <section class="slide">
+    <div class="chapter">Episodio 3 · Le tue Adorni</div>
+    <h2>Dove vai <span class="yellow-glow">ogni giorno</span>?</h2>
+    <p class="big center">Alzi la mano chi usa…</p>
+    <div class="grid">
+      <div class="card"><span class="icon">🎵</span><strong>TikTok</strong><p>Video brevi e balli</p></div>
+      <div class="card"><span class="icon">📺</span><strong>YouTube</strong><p>Video e gameplay</p></div>
+      <div class="card"><span class="icon">🎮</span><strong>Roblox / Fortnite</strong><p>Giocare con amici</p></div>
+      <div class="card"><span class="icon">⛏️</span><strong>Minecraft</strong><p>Costruire e esplorare</p></div>
+      <div class="card"><span class="icon">💬</span><strong>WhatsApp</strong><p>Chat e gruppi classe</p></div>
+      <div class="card"><span class="icon">📸</span><strong>Instagram</strong><p>Foto e storie</p></div>
+      <div class="card"><span class="icon">🎬</span><strong>Netflix</strong><p>Film e serie</p></div>
+    </div>
+    <p class="center" style="margin-top:2vh; color: var(--text-dim); font-style: italic;">In media un bambino italiano della tua età passa <b class="glow-yellow">3-4 ore al giorno</b> davanti agli schermi 📱</p>
+  </section>
+
+  <!-- SLIDE 5: REFLECTION 1 -->
+  <section class="slide">
+    <div class="diary">
+      <div class="diary-tape"></div>
+      <div class="diary-stamp">ADORNI<br>POLICE DEPT.</div>
+      <div class="meta">
+        <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
+        <span class="timer">⏱ 3 MINUTI</span>
+      </div>
+      <h2>Quanto del tuo tempo<br>passi al <u>Sottosopra</u>?</h2>
+      <ul class="prompts">
+        <li>In una giornata, quante ore stai sui social o sui giochi?</li>
+        <li>Cosa fai quando metti via il telefono?</li>
+        <li>Se ti tolgono lo schermo, come ti senti? Felice? Annoiato? Arrabbiato?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SLIDE 6: PERSONAL INFO -->
+  <section class="slide">
+    <div class="chapter">Episodio 4 · I tuoi EGGOS segreti</div>
+    <h2><svg class="waffle-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="waffle-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fde68a"/>
+          <stop offset="50%" stop-color="#fbbf24"/>
+          <stop offset="100%" stop-color="#d97706"/>
+        </linearGradient>
+      </defs>
+      <rect x="8" y="8" width="84" height="84" rx="10" fill="url(#waffle-grad)" stroke="#92400e" stroke-width="2.5"/>
+      <!-- Grid pattern -->
+      <g fill="#92400e" opacity="0.45">
+        <rect x="16" y="16" width="16" height="16" rx="2"/>
+        <rect x="34" y="16" width="16" height="16" rx="2"/>
+        <rect x="52" y="16" width="16" height="16" rx="2"/>
+        <rect x="70" y="16" width="16" height="16" rx="2"/>
+        <rect x="16" y="34" width="16" height="16" rx="2"/>
+        <rect x="34" y="34" width="16" height="16" rx="2"/>
+        <rect x="52" y="34" width="16" height="16" rx="2"/>
+        <rect x="70" y="34" width="16" height="16" rx="2"/>
+        <rect x="16" y="52" width="16" height="16" rx="2"/>
+        <rect x="34" y="52" width="16" height="16" rx="2"/>
+        <rect x="52" y="52" width="16" height="16" rx="2"/>
+        <rect x="70" y="52" width="16" height="16" rx="2"/>
+        <rect x="16" y="70" width="16" height="16" rx="2"/>
+        <rect x="34" y="70" width="16" height="16" rx="2"/>
+        <rect x="52" y="70" width="16" height="16" rx="2"/>
+        <rect x="70" y="70" width="16" height="16" rx="2"/>
+      </g>
+      <!-- Pixel-style "L'EGGO" label -->
+      <text x="50" y="98" text-anchor="middle" font-family="Bowlby One" font-size="6" fill="#7c2d12">L'EGGO</text>
+    </svg>Le tue <span class="purple-glow">INFORMAZIONI</span> sono i tuoi EGGOS</h2>
+    <p class="center max-w-1000">Sono <b>preziosi</b>, sono <b>tuoi</b>, e <b>NON li dai al primo che incontri</b>. Eleven nascondeva il suo passato anche da Mike — perché era il suo segreto.</p>
+    <div class="grid">
+      <div class="card bad"><span class="icon">📛</span><strong>Nome e cognome</strong><p>Mai a sconosciuti</p></div>
+      <div class="card bad"><span class="icon">🏫</span><strong>Scuola</strong><p>Sanno dove sei ogni giorno</p></div>
+      <div class="card bad"><span class="icon">🏠</span><strong>Casa</strong><p>Dove vivi</p></div>
+      <div class="card bad"><span class="icon">📱</span><strong>Telefono</strong><p>Tuo o dei genitori</p></div>
+      <div class="card bad"><span class="icon">📷</span><strong>Foto / video</strong><p>Specialmente in costume</p></div>
+      <div class="card bad"><span class="icon">🔑</span><strong>Password</strong><p>SOLO mamma e papà</p></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 7: GRANDFATHER PARK -->
+  <section class="slide">
+    <div class="chapter blue">Trucco segreto del Club</div>
+    <h2>La regola del <span class="yellow-glow">"NONNO al PARCO"</span> 👴🌳</h2>
+    <div class="speech big-quote max-w-900">
+      Prima di scrivere o postare qualcosa, chiediti:<br><br>
+      <b class="glow-yellow" style="font-size:1.15em;">"Lo direi a uno sconosciuto seduto<br>sulla panchina del parco?"</b><br><br>
+      Se la risposta è <span class="glow-red">NO</span> 🚫 → <b>non scriverlo online!</b>
+    </div>
+    <p class="big center" style="margin-top: 2vh;">Internet è come <u>un parco enorme</u> pieno di persone che non conosci.</p>
+  </section>
+
+  <!-- SLIDE 8: DEMOGORGON -->
+  <section class="slide">
+    <div class="chapter red">Episodio 5 · Il Demogorgone</div>
+    <h2>Attento al <span class="red-glow">DEMOGORGONE</span> 👹</h2>
+    <div class="row" style="margin-top: 2vh;">
+      <img src="assets/demogorgon_full_red.svg" alt="Demogorgone" class="st-art medium">
+      <div class="speech walkie" style="max-width:520px;">
+        Il <b class="glow-red">Demogorgone</b> di internet è uno <b>sconosciuto che si finge un amico</b>: si comporta da bambino della tua età, conosce le tue cose preferite, è sempre gentile…<br><br>
+        …ma <b class="glow-red">vuole le tue informazioni o le tue foto</b>. Non puoi vederlo, ma è lì.
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 9: SOFIA -->
+  <section class="slide">
+    <div class="chapter purple">📁 File caso #1 · classificato</div>
+    <div class="story">
+      <div class="story-tape"></div>
+      <div class="story-title">
+        <span class="story-badge">CASO 001</span>
+        Sofia e l'amica misteriosa 🕵️
+      </div>
+      <p>👧 <b>Sofia, 10 anni</b>, ama TikTok. Riceve un messaggio da <i>"Giulia2014"</i>: «Ciao! Anche io ho 10 anni, andiamo nella stessa città!»</p>
+      <p>💬 Chattano per <b>3 settimane</b>. Giulia è simpaticissima: scuola, danza, cantanti preferiti.</p>
+      <p>📸 Poi Giulia chiede: «Mi mandi una foto in costume? Te la mando dopo!»</p>
+      <p>😟 Sofia ha un dubbio strano allo stomaco. <b>Per fortuna lo dice alla mamma.</b></p>
+      <p>🚨 La polizia scopre: <i>"Giulia2014"</i> NON era una bambina. Era un Demogorgone di 47 anni che fingeva di esserlo per ottenere foto.</p>
+      <div class="lesson">
+        💡 <b>LEZIONE:</b> Online <u>non puoi essere sicuro</u> di chi c'è dall'altra parte. Anche se sembra una bambina come te, potrebbe essere un Demogorgone. <b>Se qualcuno chiede foto o info → chiama l'adulto SUBITO</b> 📻
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 10: REFLECTION 2 -->
+  <section class="slide">
+    <div class="diary">
+      <div class="diary-tape"></div>
+      <div class="diary-stamp">ADORNI<br>POLICE DEPT.</div>
+      <div class="meta">
+        <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
+        <span class="timer">⏱ 4 MINUTI</span>
+      </div>
+      <h2>Hai mai parlato con uno<br><u>sconosciuto</u> online?</h2>
+      <ul class="prompts">
+        <li>Su quale app è successo?</li>
+        <li>Come hai capito (o non hai capito) che era uno sconosciuto?</li>
+        <li>Cosa avresti fatto se ti avesse chiesto una foto o il tuo indirizzo?</li>
+        <li>A chi puoi parlarne quando succede?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SLIDE 11: QUIZ 1a -->
+  <section class="slide">
+    <div class="chapter green">🎯 PROVA DEL CLUB #1</div>
+    <div class="quiz-question" data-correct="1">
+      <h3>❓ Un nuovo amico online ti chiede: «In che scuola vai?». Cosa fai?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-i="0">📝 Glielo dico, è solo il nome di una scuola</button>
+        <button class="quiz-option" data-i="1">🤐 Non rispondo e lo dico a un adulto</button>
+        <button class="quiz-option" data-i="2">🤥 Gli do il nome di un'altra scuola per scherzo</button>
+        <button class="quiz-option" data-i="3">😄 Mando una foto della scuola</button>
+      </div>
+      <div class="quiz-feedback ok"><b class="glow-yellow">BRAVISSIMO!</b> 🌟 Il Demogorgone vuole sapere dove sei ogni mattina. Anche fingere è rischioso: meglio non rispondere e usare il walkie-talkie 📻 (parlare con un adulto).</div>
+      <div class="quiz-feedback ko"><b class="glow-red">ATTENZIONE!</b> ⚠️ Dare il nome della scuola permette a un Demogorgone di sapere dove sei ogni mattina. È un'informazione molto pericolosa!</div>
+    </div>
+  </section>
+
+  <!-- SLIDE 12: QUIZ 1b -->
+  <section class="slide">
+    <div class="chapter green">🎯 PROVA DEL CLUB #1 · ancora</div>
+    <div class="quiz-question" data-correct="2">
+      <h3>❓ Qual è una <span class="yellow-glow">buona password</span>?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-i="0">123456</button>
+        <button class="quiz-option" data-i="1">Il tuo nome + anno di nascita</button>
+        <button class="quiz-option" data-i="2">Una frase strana che ricordi solo tu (es. EggosConPatateBlu!)</button>
+        <button class="quiz-option" data-i="3">"password"</button>
+      </div>
+      <div class="quiz-feedback ok"><b class="glow-yellow">PERFETTO!</b> 🦸 Una password forte è lunga, mescola parole strane, numeri e simboli. Una frase divertente che SOLO tu sai è imbattibile!</div>
+      <div class="quiz-feedback ko"><b class="glow-red">ATTENZIONE!</b> 🚫 Le password semplici si "indovinano" in pochi secondi. Anche il tuo nome è pubblico, quindi è facile da scoprire.</div>
+    </div>
+  </section>
+
+  <!-- SLIDE 13: SCAMS -->
+  <section class="slide">
+    <div class="chapter red">Episodio 6 · I portali del Sottosopra</div>
+    <h2>Attento alle <span class="red-glow">TRAPPOLE</span> 🌀</h2>
+    <p class="center max-w-1000">Le trappole online sono <b>come portali del Sottosopra</b>: sembrano regali luccicanti, ma quando ci entri… ti rubano gli Eggos.</p>
+    <div class="scam-box">🎁 «1.000 ROBUX GRATIS! Clicca qui!»</div>
+    <div class="scam-box" style="animation-delay:.3s;">📱 «Hai vinto un iPhone! Inserisci la password»</div>
+    <div class="scam-box" style="animation-delay:.6s;">🎮 «Skin di Fortnite GRATIS, scrivi qui i tuoi dati»</div>
+    <p class="big center" style="margin-top: 2vh;">📏 <b>Codice del Club:</b> se è GRATIS e troppo bello → <span class="glow-red">è una TRAPPOLA</span>! 🚨</p>
+  </section>
+
+  <!-- SLIDE 14: MARCO -->
+  <section class="slide">
+    <div class="chapter purple">📁 File caso #2 · classificato</div>
+    <div class="story">
+      <div class="story-tape"></div>
+      <div class="story-title">
+        <span class="story-badge">CASO 002</span>
+        Marco e i 10.000 Robux gratis 💎
+      </div>
+      <p>👦 <b>Marco, 9 anni</b>, gioca a Roblox tutti i pomeriggi. Ha 27 skin e un avatar fortissimo.</p>
+      <p>🎬 Su YouTube vede: <i>"Come avere 10.000 Robux GRATIS in 1 minuto!"</i> Il bambino del video sembra contentissimo.</p>
+      <p>🖱️ Marco clicca. Si apre una pagina identica a Roblox. Inserisce nome utente e password.</p>
+      <p>💥 Il giorno dopo: account <b>rubato</b>. Skin sparite. Email cambiata. Marco è disperato.</p>
+      <p>🌀 Era un sito FALSO che copiava Roblox per rubare le password. Un portale per il Sottosopra. Si chiama <b>"phishing"</b> (pesca).</p>
+      <div class="lesson">
+        💡 <b>LEZIONE:</b> Nessuno regala niente di valore. "Robux gratis", "V-Bucks gratis", "skin gratis" sono <u>SEMPRE trappole</u>. Non cliccare. Se hai dubbi → walkie-talkie 📻 a un adulto PRIMA.
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 15: REFLECTION 3 -->
+  <section class="slide">
+    <div class="diary">
+      <div class="diary-tape"></div>
+      <div class="diary-stamp">ADORNI<br>POLICE DEPT.</div>
+      <div class="meta">
+        <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
+        <span class="timer">⏱ 3 MINUTI</span>
+      </div>
+      <h2>Cosa rende un'offerta<br><u>"GRATIS"</u> sospetta?</h2>
+      <ul class="prompts">
+        <li>Quali parole vedi sempre nelle trappole? (Es. GRATIS, ULTIMA OCCASIONE, SOLO OGGI…)</li>
+        <li>Perché qualcuno regalerebbe Robux o V-Bucks?</li>
+        <li>Se un tuo amico è caduto in una trappola, cosa puoi consigliargli?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SLIDE 16: VECNA - CYBERBULLYING -->
+  <section class="slide">
+    <div class="chapter red">Episodio 7 · Vecna · <span class="caveat" style="font-size:1.2em; letter-spacing:0;">tick… tock…</span></div>
+    <h2><span class="red-glow">VECNA</span> e le parole che feriscono 💀</h2>
+    <div class="row mt-2">
+      <!-- Grandfather Clock (Vecna's signature) -->
+      <svg class="clock-icon" viewBox="0 0 140 240" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="clock-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#5a3a1a"/>
+            <stop offset="100%" stop-color="#2d1808"/>
+          </linearGradient>
+        </defs>
+        <path d="M30 20 Q70 0 110 20 L100 35 L40 35 Z" fill="url(#clock-grad)"/>
+        <rect x="20" y="35" width="100" height="180" rx="4" fill="url(#clock-grad)"/>
+        <rect x="30" y="45" width="80" height="160" rx="2" fill="#1c0d04"/>
+        <circle cx="70" cy="80" r="28" fill="#fef3c7" stroke="#5a3a1a" stroke-width="3"/>
+        <line x1="70" y1="55" x2="70" y2="60" stroke="#3b0d0d" stroke-width="2"/>
+        <line x1="70" y1="100" x2="70" y2="105" stroke="#3b0d0d" stroke-width="2"/>
+        <line x1="45" y1="80" x2="50" y2="80" stroke="#3b0d0d" stroke-width="2"/>
+        <line x1="90" y1="80" x2="95" y2="80" stroke="#3b0d0d" stroke-width="2"/>
+        <line x1="70" y1="80" x2="70" y2="65" stroke="#3b0d0d" stroke-width="3" stroke-linecap="round"/>
+        <line x1="70" y1="80" x2="83" y2="80" stroke="#3b0d0d" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="70" cy="80" r="3" fill="#3b0d0d"/>
+        <rect x="50" y="120" width="40" height="80" rx="2" fill="#0a0500"/>
+        <g class="pendulum">
+          <line x1="70" y1="125" x2="70" y2="180" stroke="#a16207" stroke-width="2"/>
+          <circle cx="70" cy="185" r="9" fill="#fbbf24" stroke="#92400e" stroke-width="1.5"/>
+        </g>
+        <rect x="15" y="215" width="110" height="15" rx="2" fill="#3b0d0d"/>
+        <circle cx="70" cy="80" r="40" fill="#dc2626" opacity="0.18">
+          <animate attributeName="opacity" values="0.1;0.3;0.1" dur="2s" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+      <img src="assets/demogorgon_silhouette_red.svg" alt="Vecna" class="st-art small">
+      <div class="speech walkie" style="max-width:520px;">
+        Vecna ferisce con la <b class="glow-red">mente</b>: entra nella testa con <b>parole cattive</b> e fa sentire piccoli, brutti, sbagliati. <b>Max</b> ne è stata vittima.<br><br>
+        Scrivere commenti cattivi online <b>fa male come uno schiaffo</b>: tutti possono leggerli, e restano lì <span class="glow-red">per sempre</span>.
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 17: HOW TO RESPOND -->
+  <section class="slide">
+    <h2>Come <span class="yellow-glow">sconfiggere Vecna</span> 🎵</h2>
+    <div class="row" style="margin-bottom:1.5vh;">
+      <!-- Walkman with orange headphones (Max's scene) -->
+      <svg class="walkman-icon" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="wm-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#e5e7eb"/>
+            <stop offset="100%" stop-color="#9ca3af"/>
+          </linearGradient>
+        </defs>
+        <!-- Headphones band -->
+        <path d="M30 95 Q100 25 170 95" stroke="#1f2937" stroke-width="6" fill="none"/>
+        <!-- Left ear cup -->
+        <circle cx="30" cy="100" r="22" fill="#f97316" stroke="#1f2937" stroke-width="3"/>
+        <circle cx="30" cy="100" r="10" fill="#1f2937"/>
+        <!-- Right ear cup -->
+        <circle cx="170" cy="100" r="22" fill="#f97316" stroke="#1f2937" stroke-width="3"/>
+        <circle cx="170" cy="100" r="10" fill="#1f2937"/>
+        <!-- Cord to walkman -->
+        <path d="M170 122 Q160 140 130 145" stroke="#1f2937" stroke-width="2.5" fill="none"/>
+        <!-- Walkman body -->
+        <rect x="70" y="125" width="80" height="50" rx="4" fill="url(#wm-grad)" stroke="#1f2937" stroke-width="2.5"/>
+        <!-- Cassette window -->
+        <rect x="78" y="133" width="64" height="22" rx="2" fill="#1f2937"/>
+        <!-- Tape reels -->
+        <circle cx="93" cy="144" r="6" fill="#e5e7eb" stroke="#1f2937" stroke-width="1.5">
+          <animateTransform attributeName="transform" type="rotate" from="0 93 144" to="360 93 144" dur="4s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="127" cy="144" r="6" fill="#e5e7eb" stroke="#1f2937" stroke-width="1.5">
+          <animateTransform attributeName="transform" type="rotate" from="0 127 144" to="360 127 144" dur="4s" repeatCount="indefinite"/>
+        </circle>
+        <!-- Buttons -->
+        <rect x="80" y="161" width="8" height="8" rx="1" fill="#1f2937"/>
+        <rect x="92" y="161" width="8" height="8" rx="1" fill="#1f2937"/>
+        <rect x="104" y="161" width="8" height="8" rx="1" fill="#dc2626"/>
+        <rect x="116" y="161" width="8" height="8" rx="1" fill="#1f2937"/>
+        <!-- Music notes floating -->
+        <text x="20" y="50" font-family="serif" font-size="22" fill="#fbbf24" opacity="0.9">♪</text>
+        <text x="175" y="55" font-family="serif" font-size="26" fill="#fbbf24" opacity="0.9">♫</text>
+        <text x="40" y="20" font-family="serif" font-size="18" fill="#fbbf24" opacity="0.7">♬</text>
+      </svg>
+      <div class="speech walkie" style="max-width:480px;">
+        <b class="glow-yellow">Max</b> si è salvata da Vecna con la sua canzone preferita ('Running Up That Hill') e con <b>i suoi amici</b>.<br><br>
+        Anche tu hai <b>la stessa arma</b>: persone vere intorno a te.
+      </div>
+    </div>
+    <div class="grid" style="max-width:1100px; margin-top:2vh;">
+      <div class="card warn"><span class="icon">😢</span><strong>Se ti succede a TE</strong><p>Non rispondere. Fai uno screenshot. Parla SUBITO con mamma, papà o un'insegnante. Blocca chi attacca.</p></div>
+      <div class="card warn"><span class="icon">👀</span><strong>Se lo vedi succedere</strong><p>Non ridere, non condividere. Sii amico di chi viene attaccato. Diglielo a un adulto.</p></div>
+      <div class="card warn"><span class="icon">✋</span><strong>Prima di scrivere TU</strong><p>Conta fino a 5. Lo diresti in faccia? Se no, NON scriverlo.</p></div>
+    </div>
+  </section>
+
+  <!-- SLIDE 18: GIULIA -->
+  <section class="slide">
+    <div class="chapter purple">📁 File caso #3 · classificato</div>
+    <div class="story">
+      <div class="story-tape"></div>
+      <div class="story-title">
+        <span class="story-badge">CASO 003</span>
+        Giulia e i commenti cattivi 💬
+      </div>
+      <p>👧 <b>Giulia, 10 anni</b>, posta su TikTok un video in cui balla con il suo cane. È felicissima.</p>
+      <p>💬 Sotto al video arrivano commenti: «sei brutta», «non sai ballare», «cancella tutto». Decine di commenti da persone che non la conoscono nemmeno.</p>
+      <p>😞 Vecna è entrato. Giulia smette di mangiare, non vuole più andare a scuola. Si vergogna di tutto.</p>
+      <p>👩‍🏫 Per fortuna parla con la sua maestra. La maestra parla con i genitori. Insieme: <b>screenshot, denuncia, profilo segnalato</b>.</p>
+      <p>🌈 Dopo qualche settimana Giulia torna a sorridere. Capisce: <b>quei commenti dicevano molto degli altri, NIENTE di lei.</b></p>
+      <div class="lesson">
+        💡 <b>LEZIONE:</b> Se qualcuno ti scrive cose cattive → <u>NON sei tu il problema</u>. Non rispondere, fai screenshot, walkie-talkie 📻 a un adulto. Non sei mai solo.
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 19: REFLECTION 4 -->
+  <section class="slide">
+    <div class="diary">
+      <div class="diary-tape"></div>
+      <div class="diary-stamp">ADORNI<br>POLICE DEPT.</div>
+      <div class="meta">
+        <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
+        <span class="timer">⏱ 4 MINUTI</span>
+      </div>
+      <h2>Cosa diresti a Giulia<br>per <u>aiutarla</u>?</h2>
+      <ul class="prompts">
+        <li>Se Giulia fosse tua amica, come la consoleresti?</li>
+        <li>Hai mai visto qualcuno preso in giro online? Hai aiutato o sei rimasto in silenzio?</li>
+        <li>Prima di scrivere un commento, quale "filtro" puoi usare nella tua testa?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SLIDE 20: MIND FLAYER / CHALLENGES -->
+  <section class="slide">
+    <div class="chapter red">Episodio 8 · Il Mind Flayer</div>
+    <h2>Il <span class="red-glow">MIND FLAYER</span> e le sfide pericolose 🦇</h2>
+    <div class="row mt-2">
+      <img src="assets/demogorgon_silhouette_pink.svg" alt="Mind Flayer" class="st-art medium">
+      <div class="speech walkie" style="max-width:520px;">
+        Il Mind Flayer <b>"controlla"</b> i corpi delle persone. Anche le challenge pericolose <b class="glow-red">"controllano"</b> i bambini: trattenere il respiro, mangiare cose tossiche, fare cose rischiose…<br><br>
+        😢 In Italia dei bambini si sono fatti molto male. Alcuni <span class="glow-red">non sono più tornati a casa.</span><br><br>
+        🦸 I veri eroi <b>non rischiano la vita per dei like</b>.
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 21: REFLECTION 5 -->
+  <section class="slide">
+    <div class="diary">
+      <div class="diary-tape"></div>
+      <div class="diary-stamp">ADORNI<br>POLICE DEPT.</div>
+      <div class="meta">
+        <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
+        <span class="timer">⏱ 3 MINUTI</span>
+      </div>
+      <h2>Quanto vale <u>un like</u>?</h2>
+      <ul class="prompts">
+        <li>Hai mai fatto qualcosa SOLO perché lo facevano gli altri?</li>
+        <li>Se tutti i tuoi amici facessero una sfida pericolosa, tu cosa faresti?</li>
+        <li>Cos'hai TU di prezioso che vale più di mille like?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SLIDE 22: QUIZ 2a -->
+  <section class="slide">
+    <div class="chapter green">🎯 PROVA DEL CLUB #2</div>
+    <div class="quiz-question" data-correct="2">
+      <h3>❓ Vedi un video: «Clicca e ricevi <span class="yellow-glow">1.000 V-Bucks gratis</span>!». Cosa fai?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-i="0">🚀 Clicco subito! È un'occasione</button>
+        <button class="quiz-option" data-i="1">📲 Lo mando ai miei amici</button>
+        <button class="quiz-option" data-i="2">🚫 Lo ignoro. So che è una trappola</button>
+        <button class="quiz-option" data-i="3">🔑 Inserisco la password</button>
+      </div>
+      <div class="quiz-feedback ok"><b class="glow-yellow">SUPER!</b> 🛡️ V-Bucks, Robux o skin "gratis" sono SEMPRE trappole. Inserire la password = regalare l'account a un Demogorgone.</div>
+      <div class="quiz-feedback ko"><b class="glow-red">ATTENZIONE!</b> ⚠️ Quelle pagine rubano password o infettano il dispositivo. Mai cliccare!</div>
+    </div>
+  </section>
+
+  <!-- SLIDE 23: QUIZ 2b -->
+  <section class="slide">
+    <div class="chapter green">🎯 PROVA DEL CLUB #2 · ancora</div>
+    <div class="quiz-question" data-correct="1">
+      <h3>❓ Qualcuno ti scrive online <span class="yellow-glow">commenti cattivissimi</span>. Cosa fai?</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-i="0">😡 Rispondo con insulti peggiori</button>
+        <button class="quiz-option" data-i="1">📸 Screenshot, blocco, walkie-talkie all'adulto 📻</button>
+        <button class="quiz-option" data-i="2">😢 Cancello tutto e non uso più nulla</button>
+        <button class="quiz-option" data-i="3">🤫 Non lo dico a nessuno, passerà</button>
+      </div>
+      <div class="quiz-feedback ok"><b class="glow-yellow">BRAVISSIMO!</b> 🦸 Screenshot = prova. Bloccare = proteggersi. Parlare con un adulto = chiedere aiuto. Tre superpoteri insieme!</div>
+      <div class="quiz-feedback ko"><b class="glow-red">NO!</b> Rispondere peggiora. Cancellare tutto è una rinuncia. Tenerselo dentro fa male. La risposta giusta: <b>screenshot + blocca + parla con un adulto</b>.</div>
+    </div>
+  </section>
+
+  <!-- SLIDE 24: QUIZ 2c -->
+  <section class="slide">
+    <div class="chapter green">🎯 PROVA DEL CLUB #2 · ultima</div>
+    <div class="quiz-question" data-correct="3">
+      <h3>❓ Un amico online ti dice: «Andiamo dal vivo, dimmi dove abiti, vengo a trovarti!»</h3>
+      <div class="quiz-options">
+        <button class="quiz-option" data-i="0">📍 Gli mando subito l'indirizzo</button>
+        <button class="quiz-option" data-i="1">🏞️ Gli dico solo la città</button>
+        <button class="quiz-option" data-i="2">👋 Lo incontro da solo al parco</button>
+        <button class="quiz-option" data-i="3">🛑 Blocco e walkie-talkie a mamma o papà 📻</button>
+      </div>
+      <div class="quiz-feedback ok"><b class="glow-yellow">BRAVISSIMO!</b> 🚨 Un "amico online" che vuole incontrarti dal vivo è un grandissimo segnale di allarme. È un Demogorgone in agguato.</div>
+      <div class="quiz-feedback ko"><b class="glow-red">ATTENZIONE!</b> 🚫 MAI dare l'indirizzo, nemmeno la città. MAI incontrare di persona qualcuno conosciuto online senza un genitore presente.</div>
+    </div>
+  </section>
+
+  <!-- SLIDE 25: WALKIE-TALKIE -->
+  <section class="slide">
+    <div class="chapter blue">Episodio 9 · Il walkie-talkie</div>
+    <h2>Il tuo <span class="yellow-glow">SUPERPOTERE</span> più grande 📻</h2>
+    <img src="assets/kids_bikes_lineart_yellow.svg" alt="La squadra in bici" class="st-art medium yellow-glow-art">
+    <p class="big center max-w-1000">Nella serie, la Squadra usa i walkie-talkie per chiamarsi quando ci sono mostri. <b>Anche tu hai il tuo walkie-talkie.</b></p>
+    <div class="speech walkie max-w-900" style="margin-top:2vh; text-align:center; font-size:clamp(1.2rem,2.4vw,1.9rem);">
+      I tuoi <b class="glow-yellow">adulti di fiducia</b> sono il tuo walkie-talkie:<br>
+      🦸 mamma · papà · maestra · nonno · zio · fratello grande<br><br>
+      <b>Chiedere aiuto NON è da fifoni.</b><br>
+      <span class="glow-yellow">È da membri del Club.</span> ⚡
+    </div>
+  </section>
+
+  <!-- SLIDE 26: GOLDEN RULES -->
+  <section class="slide">
+    <div class="chapter">🏆 I CODICI DELL'ADORNI</div>
+    <h2>Le 5 regole del <span class="yellow-glow">Club</span></h2>
+    <div class="rules">
+      <div class="rule">
+        <div class="num">1</div>
+        <div>
+          <strong>NON parlare con i Demogorgoni</strong>
+          <p>Online vale come per strada. Anche se sembra simpatico/a, non sai chi c'è davvero dall'altra parte.</p>
+        </div>
+      </div>
+      <div class="rule">
+        <div class="num">2</div>
+        <div>
+          <strong>Proteggi i tuoi EGGOS</strong>
+          <p>Nome, scuola, casa, telefono, password, foto: sono tuoi e di nessun altro.</p>
+        </div>
+      </div>
+      <div class="rule">
+        <div class="num">3</div>
+        <div>
+          <strong>GRATIS = TRAPPOLA</strong>
+          <p>Robux, V-Bucks, iPhone gratis… sono portali per il Sottosopra. Non cliccare, non scaricare.</p>
+        </div>
+      </div>
+      <div class="rule">
+        <div class="num">4</div>
+        <div>
+          <strong>Sconfiggi Vecna con gentilezza</strong>
+          <p>Le parole cattive feriscono come un pugno. Pensa prima di scrivere. Difendi chi viene attaccato.</p>
+        </div>
+      </div>
+      <div class="rule">
+        <div class="num">5</div>
+        <div>
+          <strong>Usa il walkie-talkie 📻</strong>
+          <p>Se qualcosa ti preoccupa, chiama subito un adulto. Sei membro di una squadra, non sei mai solo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 27: PLEDGE -->
+  <section class="slide">
+    <div class="chapter purple">⚡ Il giuramento del Club</div>
+    <img src="assets/friends_dont_lie_yellow.svg" alt="Friends Don't Lie" class="st-art medium yellow-glow-art" style="margin-bottom:2vh;">
+    <div class="pledge">
+      <h2>«<span class="yellow-glow">FRIENDS DON'T LIE</span>»<br><span style="font-size:0.7em; color: var(--text-dim);">Il Patto del Club dell'Adorni</span></h2>
+      <p style="font-size:clamp(1.1rem,2.1vw,1.55rem); margin-bottom:1vh; color: var(--text-dim);">Io, membro/a del Club dell'Adorni, prometto di:</p>
+      <ul>
+        <li>⚡ Proteggere i miei EGGOS (informazioni personali)</li>
+        <li>⚡ Non parlare con i Demogorgoni online</li>
+        <li>⚡ Pensare prima di cliccare o scrivere</li>
+        <li>⚡ Sconfiggere Vecna con la gentilezza</li>
+        <li>⚡ Dire NO alle sfide del Mind Flayer</li>
+        <li>⚡ Usare sempre il walkie-talkie 📻 con un adulto</li>
+      </ul>
+      <p class="big" style="margin-top:1vh;" class="glow-yellow">🦸 Sei pronto/a per la missione?</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 28: FINAL -->
+  <section class="slide">
+    <div class="title-stack" style="gap: 1.2vh;">
+      <div class="row" style="gap: 16px; align-items: center;">
+        <img src="assets/dustin_yellow.svg" alt="Dustin" class="st-art medium yellow-glow-art">
+        <img src="assets/forest_bikes_silhouette_yellow.svg" alt="Adorni è salva" class="st-art medium yellow-glow-art">
+      </div>
+      <h1 style="font-size: clamp(2.2rem, 5.5vw, 4.4rem);">ADORNI<br>È SALVA! ⚡</h1>
+      <div class="subtitle"><span class="caveat">«Make mistakes, learn from them. And when life hurts you…<br>just remember the pain. And what fixed it was friends.»</span><br><span style="font-size:0.7em; color: var(--text-dim);">— Hopper, Stranger Things</span></div>
+      <button class="cta" onclick="celebrate()">⚡ FESTA AL CLUB ⚡</button>
+    </div>
+  </section>
+
+</div>
+
+
+<script>
+  // Ash particles
+  const ashContainer = document.getElementById('ashContainer');
+  for (let i = 0; i < 35; i++) {
+    const a = document.createElement('div');
+    a.className = 'ash';
+    a.style.left = (Math.random() * 100) + 'vw';
+    a.style.animationDuration = (12 + Math.random() * 18) + 's';
+    a.style.animationDelay = (Math.random() * 25) + 's';
+    a.style.opacity = (0.3 + Math.random() * 0.4);
+    a.style.width = a.style.height = (2 + Math.random() * 4) + 'px';
+    ashContainer.appendChild(a);
+  }
+
+  // Christmas lights bulbs
+  const bulbsGroup = document.getElementById('bulbs');
+  const bulbColors = ['#dc2626', '#fbbf24', '#10b981', '#3b82f6', '#ec4899', '#f97316'];
+  const NUM_BULBS = 32;
+  const W = 1600;
+  for (let i = 0; i < NUM_BULBS; i++) {
+    const t = i / (NUM_BULBS - 1);
+    const x = t * W;
+    // Approximate the sagging wire path - cosine sag with period
+    const period = W / 2;
+    const sag = Math.abs(Math.sin((x / period) * Math.PI)) * 35 + 15;
+    const y = sag;
+    const color = bulbColors[i % bulbColors.length];
+    const twinkle = ['twinkle1','twinkle2','twinkle3'][i % 3];
+    const dur = (1.5 + Math.random() * 2).toFixed(1);
+    const delay = (Math.random() * 2).toFixed(1);
+    bulbsGroup.insertAdjacentHTML('beforeend', `
+      <g transform="translate(${x},${y})" class="bulb">
+        <!-- Cap -->
+        <rect x="-3" y="-6" width="6" height="4" fill="#222" rx="1"/>
+        <!-- Bulb -->
+        <ellipse cx="0" cy="6" rx="6" ry="9" fill="${color}" opacity="0.95" style="animation: ${twinkle} ${dur}s ease-in-out infinite ${delay}s"/>
+        <!-- Glow halo -->
+        <circle cx="0" cy="6" r="18" fill="${color}" opacity="0.25" class="bulb-glow" style="animation: ${twinkle} ${dur}s ease-in-out infinite ${delay}s"/>
+        <!-- Highlight -->
+        <ellipse cx="-2" cy="3" rx="1.5" ry="2.5" fill="white" opacity="0.6"/>
+      </g>
+    `);
+  }
+
+  const slides = document.querySelectorAll('.slide');
+  let idx = 0;
+  const totEl = document.getElementById('tot');
+  const curEl = document.getElementById('cur');
+  const bar = document.getElementById('progressBar');
+  totEl.textContent = slides.length;
+
+  function show(i) {
+    slides.forEach((s, n) => s.classList.toggle('active', n === i));
+    curEl.textContent = String(i + 1).padStart(2, '0');
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    // disable tap zones at edges
+    document.querySelector('.tap-prev').classList.toggle('disabled', i === 0);
+    document.querySelector('.tap-next').classList.toggle('disabled', i === slides.length - 1);
+  }
+  function triggerGlitch(targetSlide) {
+    const o = document.getElementById('glitchOverlay');
+    const t = document.getElementById('trackingBar');
+    o.classList.remove('active');
+    t.classList.remove('active');
+    void o.offsetWidth; // force reflow
+    void t.offsetWidth;
+    o.classList.add('active');
+    t.classList.add('active');
+    if (targetSlide) {
+      targetSlide.classList.add('glitching');
+      setTimeout(() => targetSlide.classList.remove('glitching'), 500);
+    }
+  }
+  function go(d) {
+    const n = Math.max(0, Math.min(slides.length - 1, idx + d));
+    if (n !== idx) {
+      idx = n;
+      show(idx);
+      triggerGlitch(slides[idx]);
+    }
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+  });
+  show(0);
+
+  // Quiz
+  document.querySelectorAll('.quiz-question').forEach(q => {
+    const correct = parseInt(q.dataset.correct, 10);
+    const options = q.querySelectorAll('.quiz-option');
+    const fOk = q.querySelector('.quiz-feedback.ok');
+    const fKo = q.querySelector('.quiz-feedback.ko');
+    options.forEach(opt => {
+      opt.addEventListener('click', () => {
+        if (opt.disabled) return;
+        const chosen = parseInt(opt.dataset.i, 10);
+        options.forEach(o => o.disabled = true);
+        if (chosen === correct) {
+          opt.classList.add('correct');
+          fOk.classList.add('show');
+          burstConfetti(70);
+        } else {
+          opt.classList.add('wrong');
+          options[correct].classList.add('correct');
+          fKo.classList.add('show');
+        }
+      });
+    });
+  });
+
+  // Confetti
+  function burstConfetti(n=80) {
+    const colors = ['#dc2626','#fbbf24','#8b5cf6','#ec4899','#10b981','#3b82f6'];
+    for (let i = 0; i < n; i++) {
+      const piece = document.createElement('div');
+      piece.className = 'confetti-piece';
+      piece.style.left = (Math.random() * 100) + 'vw';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.borderRadius = Math.random() > .5 ? '50%' : '3px';
+      const rot0 = Math.random() * 360;
+      piece.style.transform = 'rotate(' + rot0 + 'deg)';
+      document.body.appendChild(piece);
+      const dur = 2200 + Math.random() * 2200;
+      const drift = (Math.random() - .5) * 240;
+      piece.animate([
+        { transform: 'rotate(' + rot0 + 'deg) translateX(0)', top: '-20px', opacity: 1 },
+        { transform: 'rotate(' + (rot0 + Math.random() * 720) + 'deg) translateX(' + drift + 'px)', top: '110vh', opacity: 0 }
+      ], { duration: dur, easing: 'cubic-bezier(.16,1,.3,1)' });
+      setTimeout(() => piece.remove(), dur);
+    }
+  }
+  function celebrate() { burstConfetti(200); }
+
+  // ============================
+  // STRANGER THINGS-STYLE SYNTH
+  // ============================
+  // Generates a minor-key arpeggio + bass drone live with Web Audio API.
+  // No external audio files. Requires user click to start (browser policy).
+  let audioCtx = null;
+  let masterGain = null;
+  let bassOsc = null;
+  let bassGain = null;
+  let padOsc1 = null, padOsc2 = null, padGain = null;
+  let arpInterval = null;
+  let musicPlaying = false;
+  let arpStep = 0;
+
+  // Notes in C minor (the iconic synthwave/ST key): C, Eb, G, Bb
+  // 16-step arpeggio that descends and ascends like the ST main theme
+  const C4 = 261.63, Eb4 = 311.13, G4 = 392.00, Bb4 = 466.16;
+  const C5 = 523.25, Eb5 = 622.25, G5 = 783.99, Bb5 = 932.33;
+  const C6 = 1046.50;
+  const ARP_PATTERN = [
+    C5, Eb5, G5, C6, G5, Eb5, C5, G4,
+    Bb4, Eb5, G5, Bb5, G5, Eb5, Bb4, G4
+  ];
+  const STEP_MS = 175; // ~85 BPM-ish
+
+  function initAudio() {
+    if (audioCtx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AC();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = 0;
+    masterGain.connect(audioCtx.destination);
+  }
+
+  function makeArpVoice(freq, startTime, duration) {
+    // Two oscillators: detuned saw + sine layer
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    osc1.type = 'sawtooth';
+    osc2.type = 'sine';
+    osc1.frequency.value = freq;
+    osc2.frequency.value = freq;
+    osc1.detune.value = -7;
+    osc2.detune.value = 7;
+
+    // Low-pass filter with slight Q for that "synth" feel
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1800, startTime);
+    filter.frequency.exponentialRampToValueAtTime(3200, startTime + 0.06);
+    filter.frequency.exponentialRampToValueAtTime(900, startTime + duration);
+    filter.Q.value = 5;
+
+    // Envelope
+    const env = audioCtx.createGain();
+    env.gain.setValueAtTime(0, startTime);
+    env.gain.linearRampToValueAtTime(0.22, startTime + 0.015);
+    env.gain.exponentialRampToValueAtTime(0.08, startTime + 0.12);
+    env.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(env);
+    env.connect(delayNode);
+    env.connect(masterGain);
+
+    osc1.start(startTime);
+    osc2.start(startTime);
+    osc1.stop(startTime + duration + 0.05);
+    osc2.stop(startTime + duration + 0.05);
+  }
+
+  let delayNode = null;
+  let delayFeedback = null;
+
+  function setupEffects() {
+    // Delay (poor-man's reverb)
+    delayNode = audioCtx.createDelay(1.0);
+    delayNode.delayTime.value = 0.31;
+    delayFeedback = audioCtx.createGain();
+    delayFeedback.gain.value = 0.42;
+    const delayFilter = audioCtx.createBiquadFilter();
+    delayFilter.type = 'lowpass';
+    delayFilter.frequency.value = 2500;
+
+    delayNode.connect(delayFilter);
+    delayFilter.connect(delayFeedback);
+    delayFeedback.connect(delayNode);
+    delayFeedback.connect(masterGain);
+  }
+
+  function startBass() {
+    // Bass drone (slow pulse on C2)
+    bassOsc = audioCtx.createOscillator();
+    bassOsc.type = 'sine';
+    bassOsc.frequency.value = 65.41; // C2
+    const bassFilter = audioCtx.createBiquadFilter();
+    bassFilter.type = 'lowpass';
+    bassFilter.frequency.value = 200;
+    bassGain = audioCtx.createGain();
+    bassGain.gain.value = 0;
+    bassOsc.connect(bassFilter);
+    bassFilter.connect(bassGain);
+    bassGain.connect(masterGain);
+    bassOsc.start();
+    // LFO modulating bass gain for slow pulse
+    const bassLFO = audioCtx.createOscillator();
+    bassLFO.frequency.value = 0.35; // very slow
+    const bassLFOGain = audioCtx.createGain();
+    bassLFOGain.gain.value = 0.18;
+    bassLFO.connect(bassLFOGain);
+    bassLFOGain.connect(bassGain.gain);
+    bassGain.gain.value = 0.16;
+    bassLFO.start();
+  }
+
+  function startPad() {
+    // Ambient pad: two detuned saws filtered low, slow attack
+    padOsc1 = audioCtx.createOscillator();
+    padOsc2 = audioCtx.createOscillator();
+    padOsc1.type = 'sawtooth';
+    padOsc2.type = 'sawtooth';
+    padOsc1.frequency.value = 130.81; // C3
+    padOsc2.frequency.value = 196.00; // G3 (open 5th)
+    padOsc1.detune.value = -12;
+    padOsc2.detune.value = 8;
+    const padFilter = audioCtx.createBiquadFilter();
+    padFilter.type = 'lowpass';
+    padFilter.frequency.value = 700;
+    padFilter.Q.value = 3;
+    // LFO on filter for movement
+    const padLFO = audioCtx.createOscillator();
+    padLFO.frequency.value = 0.12;
+    const padLFOGain = audioCtx.createGain();
+    padLFOGain.gain.value = 300;
+    padLFO.connect(padLFOGain);
+    padLFOGain.connect(padFilter.frequency);
+    padLFO.start();
+    padGain = audioCtx.createGain();
+    padGain.gain.value = 0.045;
+    padOsc1.connect(padFilter);
+    padOsc2.connect(padFilter);
+    padFilter.connect(padGain);
+    padGain.connect(masterGain);
+    padOsc1.start();
+    padOsc2.start();
+  }
+
+  function scheduleArp() {
+    if (!musicPlaying) return;
+    const now = audioCtx.currentTime;
+    // Schedule next 16 steps
+    for (let i = 0; i < 16; i++) {
+      const t = now + i * (STEP_MS / 1000);
+      const note = ARP_PATTERN[(arpStep + i) % ARP_PATTERN.length];
+      // Lower volume on certain beats for groove
+      makeArpVoice(note, t, 0.42);
+    }
+    arpStep = (arpStep + 16) % (ARP_PATTERN.length * 4);
+  }
+
+  function startMusic() {
+    initAudio();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    musicPlaying = true;
+    arpStep = 0;
+    setupEffects();
+    startBass();
+    startPad();
+    // Fade in master
+    masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(0.55, audioCtx.currentTime + 2);
+    scheduleArp();
+    arpInterval = setInterval(scheduleArp, STEP_MS * 16);
+  }
+
+  function stopMusic() {
+    musicPlaying = false;
+    if (arpInterval) { clearInterval(arpInterval); arpInterval = null; }
+    if (!audioCtx) return;
+    masterGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.2);
+    setTimeout(() => {
+      try {
+        if (bassOsc) { bassOsc.stop(); bassOsc.disconnect(); bassOsc = null; }
+        if (padOsc1) { padOsc1.stop(); padOsc1.disconnect(); padOsc1 = null; }
+        if (padOsc2) { padOsc2.stop(); padOsc2.disconnect(); padOsc2 = null; }
+      } catch(e) {}
+    }, 1300);
+  }
+
+  function toggleMusic() {
+    const btn = document.getElementById('musicBtn');
+    const audio = document.getElementById('introAudio');
+    if (audio && audio.src && !audioFailed) {
+      if (audio.paused) {
+        audio.volume = 0;
+        audio.play().then(() => {
+          fadeAudio(audio, 0, TARGET_MUSIC_VOLUME, 900);
+          btn.classList.add('playing');
+          btn.innerHTML = '🔊 MUSICA';
+        }).catch(() => {
+          audioFailed = true;
+          toggleMusic();
+        });
+      } else {
+        fadeAudio(audio, audio.volume, 0, 700, () => audio.pause());
+        btn.classList.remove('playing');
+        btn.innerHTML = '🔇 MUSICA';
+      }
+    } else {
+      // Synth fallback
+      if (!musicPlaying) {
+        startMusic();
+        btn.classList.add('playing');
+        btn.innerHTML = '🔊 MUSICA';
+      } else {
+        stopMusic();
+        btn.classList.remove('playing');
+        btn.innerHTML = '🔇 MUSICA';
+      }
+    }
+  }
+
+  let audioFailed = false;
+
+  // === INTRO SPLASH ===
+  const TARGET_MUSIC_VOLUME = 0.5;
+
+  function fadeAudio(audio, from, to, durationMs, onDone) {
+    if (!audio) return;
+    audio.volume = from;
+    const steps = 30;
+    const dt = durationMs / steps;
+    let i = 0;
+    const id = setInterval(() => {
+      i++;
+      audio.volume = from + (to - from) * (i / steps);
+      if (i >= steps) {
+        clearInterval(id);
+        audio.volume = to;
+        if (onDone) onDone();
+      }
+    }, dt);
+  }
+
+  // Build letter spans inside intro lines (no per-letter animation - whole title zooms)
+  function buildIntroLetters() {
+    const lines = document.querySelectorAll('#introTitle .intro-line');
+    lines.forEach((line) => {
+      const txt = line.dataset.text;
+      line.innerHTML = '';
+      [...txt].forEach((ch) => {
+        const span = document.createElement('span');
+        if (ch === ' ') {
+          span.className = 'st-letter space-letter';
+          span.innerHTML = '&nbsp;';
+        } else {
+          span.className = 'st-letter';
+          span.textContent = ch;
+        }
+        line.appendChild(span);
+      });
+    });
+  }
+
+  let introTimers = [];
+  function clearIntroTimers() {
+    introTimers.forEach(t => clearTimeout(t));
+    introTimers = [];
+  }
+
+  function enterClub() {
+    const intro = document.getElementById('introScreen');
+    const audio = document.getElementById('introAudio');
+    const btn = document.getElementById('musicBtn');
+    // Start music with a long, cinematic fade-in
+    audio.volume = 0;
+    audio.play().then(() => {
+      fadeAudio(audio, 0, TARGET_MUSIC_VOLUME, 3500);
+      btn.classList.add('playing');
+      btn.innerHTML = '🔊 MUSICA';
+    }).catch(() => {
+      audioFailed = true;
+      startMusic();
+      btn.classList.add('playing');
+      btn.innerHTML = '🔊 MUSICA';
+    });
+
+    // Build letters (zoom animation runs on the whole title block)
+    buildIntroLetters();
+
+    // Start the 40-second cinematic zoom
+    intro.classList.add('revealing');
+
+    // After zoom completes (~40s) → reveal subtitle + foot
+    const ZOOM_DURATION = 40;
+    const HOLD_AFTER_ZOOM = 4;
+    introTimers.push(setTimeout(() => {
+      intro.classList.add('revealed');
+    }, (ZOOM_DURATION - 1) * 1000));
+
+    // Auto-advance after hold
+    introTimers.push(setTimeout(() => {
+      hideIntro();
+    }, (ZOOM_DURATION + HOLD_AFTER_ZOOM) * 1000));
+  }
+
+  function hideIntro() {
+    clearIntroTimers();
+    const intro = document.getElementById('introScreen');
+    if (!intro) return;
+    intro.classList.add('hide');
+    triggerGlitch(document.querySelector('.slide.active'));
+    setTimeout(() => { try { intro.remove(); } catch(e){} }, 1400);
+  }
+
+  function skipIntro() { hideIntro(); }
+
+  // Enter/Space on intro fires the action contextually
+  document.addEventListener('keydown', e => {
+    const intro = document.getElementById('introScreen');
+    if (!intro) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (intro.classList.contains('revealing')) {
+        hideIntro();
+      } else {
+        enterClub();
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      hideIntro();
+    }
+  });
+</script>
+
+</body>
+</html>
