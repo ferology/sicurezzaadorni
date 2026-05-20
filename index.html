@@ -971,6 +971,17 @@
     margin-left: 8px;
     transform: rotate(-2deg);
     box-shadow: 0 2px 6px rgba(220, 38, 38, 0.35);
+    opacity: 0;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .real-revealed .real-badge {
+    opacity: 1;
+    animation: badgeStamp 0.7s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes badgeStamp {
+    0%   { opacity: 0; transform: rotate(8deg) scale(2); }
+    60%  { opacity: 1; transform: rotate(-4deg) scale(0.95); }
+    100% { opacity: 1; transform: rotate(-2deg) scale(1); }
   }
   .source-note {
     margin-top: 12px;
@@ -980,8 +991,49 @@
     font-size: 0.95rem;
     letter-spacing: 0.5px;
     color: rgba(0, 0, 0, 0.55);
+    display: none;
   }
   .source-note b { color: var(--upside-red-deep); font-family: inherit; }
+  .real-revealed .source-note {
+    display: block;
+    animation: sourceUnfold 0.7s cubic-bezier(.16,1,.3,1) forwards;
+  }
+  @keyframes sourceUnfold {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Reveal-real button */
+  .reveal-real-btn {
+    margin-top: 14px;
+    background: var(--ink);
+    color: var(--hawkins-yellow);
+    border: 2px dashed var(--upside-red);
+    padding: 10px 22px;
+    border-radius: 4px;
+    font-family: 'VT323', monospace;
+    letter-spacing: 2px;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: inline-block;
+  }
+  .reveal-real-btn:hover {
+    background: var(--upside-red);
+    color: white;
+    border-color: var(--upside-red);
+    transform: scale(1.03);
+    box-shadow: 0 6px 14px rgba(220, 38, 38, 0.4);
+  }
+  .reveal-real-btn::before { content: '🔓 '; }
+  .real-revealed .reveal-real-btn { display: none; }
+
+  /* For Mind Flayer speech reveal */
+  .hidden-facts { display: none; }
+  .real-revealed .hidden-facts {
+    display: block;
+    animation: sourceUnfold 0.7s cubic-bezier(.16,1,.3,1) forwards;
+  }
 
   /* === QUIZ === */
   .quiz-question {
@@ -1304,21 +1356,23 @@
     box-shadow: 0 6px 16px rgba(0,0,0,0.4);
   }
   .diary h2 {
-    font-family: 'Caveat', cursive;
-    font-weight: 700;
+    font-family: 'DM Serif Display', 'Cormorant Garamond', serif;
+    font-weight: 400;
+    font-style: italic;
     color: var(--ink);
     text-align: left;
-    font-size: clamp(2rem, 4vw, 3.4rem);
-    line-height: 1.05;
+    font-size: clamp(1.8rem, 3.6vw, 2.9rem);
+    line-height: 1.1;
     margin-top: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     letter-spacing: 0;
   }
   .diary p, .diary li {
     color: var(--ink);
-    font-family: 'Caveat', cursive;
+    font-family: 'Cormorant Garamond', serif;
     font-weight: 600;
-    font-size: clamp(1.25rem, 2.4vw, 1.9rem);
+    font-style: italic;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
     line-height: 1.4;
   }
   .diary .prompts { margin-top: 12px; }
@@ -1917,6 +1971,7 @@
       <div class="lesson">
         💡 <b>LEZIONE:</b> Online <u>non puoi essere sicuro</u> di chi c'è dall'altra parte. Anche se sembra un bambino come te, potrebbe essere un Demogorgone. <b>Se qualcuno chiede foto o info → chiama l'adulto SUBITO</b> 📻
       </div>
+      <button class="reveal-real-btn" onclick="revealReal(this)">SCOPRI LA STORIA VERA</button>
       <div class="source-note">📁 <b>Successo davvero · Torino, aprile 2026</b> · Indagine della Procura di Torino. Solo nel 2025, la Polizia Postale italiana ha trattato <b>434 casi</b> di adescamento online di minori.</div>
     </div>
   </section>
@@ -2002,6 +2057,7 @@
       <div class="lesson">
         💡 <b>LEZIONE:</b> Nessuno regala niente di valore. "Robux gratis", "V-Bucks gratis", "skin gratis" sono <u>SEMPRE trappole</u>. Non cliccare. Se hai dubbi → walkie-talkie 📻 a un adulto PRIMA.
       </div>
+      <button class="reveal-real-btn" onclick="revealReal(this)">SCOPRI LA STORIA VERA</button>
       <div class="source-note">📁 <b>Fenomeno documentato in Italia</b> · Polizia Postale: <b>2.623 casi</b> di crimini informatici trattati nel 2025. Fonti: McAfee, Kaspersky, Money.it.</div>
     </div>
   </section>
@@ -2139,6 +2195,7 @@
       <div class="lesson">
         💡 <b>LEZIONE:</b> Se qualcuno ti scrive cose cattive → <u>NON sei tu il problema</u>. Non rispondere, fai screenshot, walkie-talkie 📻 a un adulto. Non sei mai solo.
       </div>
+      <button class="reveal-real-btn" onclick="revealReal(this)">SCOPRI LA STORIA VERA</button>
       <div class="source-note">📁 <b>Successo davvero · Eboli (SA), febbraio 2026</b> · I casi di cyberbullismo sono in aumento (+12%) — più colpita la fascia 6-13 anni. Fonte: SalernoToday, Quotidiano Nazionale.</div>
     </div>
   </section>
@@ -2163,15 +2220,19 @@
 
   <!-- SLIDE 20: MIND FLAYER / CHALLENGES -->
   <section class="slide">
-    <div class="chapter red">Episodio 8 · Il Mind Flayer · <span style="text-transform:none; letter-spacing:0;" class="caveat">fatti veri</span></div>
+    <div class="chapter red">Episodio 8 · Il Mind Flayer</div>
     <h2>Il <span class="red-glow">MIND FLAYER</span> e le sfide pericolose 🦇</h2>
     <div class="row mt-2">
       <img src="assets/demogorgon_silhouette_pink.svg" alt="Mind Flayer" class="st-art medium">
-      <div class="speech walkie" style="max-width:540px;">
+      <div class="speech walkie" style="max-width:560px;">
         Il Mind Flayer <b>"controlla"</b> i corpi delle persone. Anche le challenge pericolose <b class="glow-red">"controllano"</b> i bambini: trattenere il respiro, mangiare cose tossiche, fare cose rischiose…<br><br>
-        😢 <b>Successo davvero:</b> a <b>Palermo, gennaio 2021</b>, una bambina di <b>10 anni</b> non è più tornata a casa dopo una sfida del <i>"blackout"</i> su TikTok.<br><br>
-        ⚖️ Dopo quella tragedia, il Garante della Privacy ha <b>bloccato TikTok in Italia</b> per costringerla a controllare l'età degli iscritti.<br><br>
         🦸 I veri eroi <b>non rischiano la vita per dei like</b>.
+        <br><br>
+        <button class="reveal-real-btn" onclick="revealReal(this)">SCOPRI LA STORIA VERA</button>
+        <div class="hidden-facts" style="margin-top:14px; padding-top:12px; border-top: 1px dashed rgba(255,255,255,0.2); font-size: 0.95em; line-height: 1.5;">
+          😢 <b class="glow-red">Successo davvero:</b> a <b>Palermo, gennaio 2021</b>, una bambina di <b>10 anni</b> non è più tornata a casa dopo una sfida del <i>"blackout"</i> su TikTok.<br><br>
+          ⚖️ Dopo quella tragedia, il Garante della Privacy ha <b>bloccato TikTok in Italia</b> per costringerla a controllare l'età degli iscritti.
+        </div>
       </div>
     </div>
   </section>
@@ -2302,9 +2363,9 @@
   <!-- SLIDE 27: PLEDGE -->
   <section class="slide">
     <div class="chapter purple">⚡ Il giuramento del Club</div>
-    <img src="assets/friends_dont_lie_yellow.svg" alt="Friends Don't Lie" class="st-art medium yellow-glow-art" style="margin-bottom:2vh;">
-    <div class="pledge">
-      <h2>«<span class="yellow-glow">FRIENDS DON'T LIE</span>»<br><span style="font-size:0.7em; color: var(--text-dim);">Il Patto del Club dell'Adorni</span></h2>
+    <img src="assets/friends_dont_lie_yellow.svg" alt="Friends Don't Lie" class="st-art large yellow-glow-art" style="margin-bottom:-1vh; max-height:38vh;">
+    <div class="pledge" style="margin-top:0;">
+      <h2 style="margin-top:14px; font-size: clamp(1.3rem, 2.6vw, 2rem);">Il Patto del Club dell'Adorni</h2>
       <p style="font-size:clamp(1.1rem,2.1vw,1.55rem); margin-bottom:1vh; color: var(--text-dim);">Io, membro/a del Club dell'Adorni, prometto di:</p>
       <ul>
         <li>⚡ Proteggere i miei EGGOS (informazioni personali)</li>
@@ -2467,6 +2528,15 @@
     }
   }
   function celebrate() { burstConfetti(200); }
+
+  // Reveal "real case" facts on click — surprises the kids with the real story
+  function revealReal(btn) {
+    const container = btn.closest('.story, .speech');
+    if (!container) return;
+    container.classList.add('real-revealed');
+    // small burst of red confetti for dramatic effect
+    burstConfetti(30);
+  }
 
   // ============================
   // STRANGER THINGS-STYLE SYNTH
