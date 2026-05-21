@@ -823,6 +823,123 @@
     box-shadow: 0 0 16px rgba(251,191,36,0.4);
   }
 
+  /* === CHARACTER CORNER DECORATIONS === */
+  /* For .story (case file) — sticker-like art floating top-right */
+  .story-art {
+    position: absolute;
+    top: 14px;
+    right: 70px; /* clear of FILE CASO stamp */
+    width: clamp(70px, 9vw, 110px);
+    height: auto;
+    transform: rotate(-6deg);
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.35));
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0.95;
+  }
+  .story-art.left-bottom {
+    top: auto; right: auto;
+    bottom: 16px; left: 18px;
+    transform: rotate(4deg);
+  }
+  /* For .diary card — chibi badge bottom-right */
+  .diary-art {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+    width: clamp(60px, 7vw, 90px);
+    height: auto;
+    transform: rotate(8deg);
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));
+    pointer-events: none;
+    opacity: 0.9;
+    animation: stickerWiggle 6s ease-in-out infinite;
+  }
+  .diary-art.top-left {
+    top: 14px; left: 18px;
+    bottom: auto; right: auto;
+    transform: rotate(-8deg);
+    animation-delay: 1.5s;
+  }
+  @keyframes stickerWiggle {
+    0%, 100% { transform: rotate(8deg) translateY(0); }
+    50%      { transform: rotate(6deg) translateY(-4px); }
+  }
+  /* Generic banner above a section */
+  .gang-banner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 1vh;
+  }
+  .gang-banner img {
+    width: clamp(120px, 14vw, 200px);
+    height: auto;
+    filter: drop-shadow(0 6px 18px rgba(251,191,36,0.35));
+  }
+  @media (max-width: 700px) {
+    .story-art { width: 60px; right: 60px; }
+    .diary-art { width: 50px; }
+    .gang-banner img { width: 90px; }
+  }
+
+  /* === COMIC BUBBLE (80s comic / Stranger Things title-card style) === */
+  .comic-bubble-wrap {
+    position: relative;
+    display: inline-block;
+    margin: 0 auto 1.5vh;
+    transform: rotate(-2.5deg);
+    animation: bubbleFloat 4s ease-in-out infinite;
+  }
+  @keyframes bubbleFloat {
+    0%, 100% { transform: rotate(-2.5deg) translateY(0); }
+    50%      { transform: rotate(-2deg) translateY(-6px); }
+  }
+  .comic-bubble {
+    position: relative;
+    background: #fef3c7;
+    color: #0a0a0a;
+    font-family: 'Bowlby One', sans-serif;
+    font-size: clamp(0.95rem, 1.85vw, 1.55rem);
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+    padding: 14px 26px;
+    border: 3px solid #0a0a0a;
+    border-radius: 28px;
+    box-shadow:
+      6px 6px 0 #0a0a0a,
+      0 0 24px rgba(251,191,36,0.55),
+      0 0 60px rgba(220,38,38,0.3);
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .comic-bubble .red { color: var(--upside-red); text-shadow: 0 0 12px rgba(220,38,38,0.6); }
+  .comic-bubble .yellow { color: var(--hawkins-yellow-deep); }
+  /* Bubble tail pointing down toward the SVG */
+  .comic-bubble::before {
+    content: '';
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 18px solid transparent;
+    border-right: 18px solid transparent;
+    border-top: 24px solid #0a0a0a;
+  }
+  .comic-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0; height: 0;
+    border-left: 13px solid transparent;
+    border-right: 13px solid transparent;
+    border-top: 18px solid #fef3c7;
+  }
+
   /* === CARDS === */
   .grid {
     display: grid;
@@ -1519,6 +1636,43 @@
     color: var(--text);
     font-weight: 500;
   }
+  /* Side-by-side layout for SVG + pledge on laptops/desktops */
+  .pledge-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(20px, 3vw, 48px);
+    width: 96%;
+    max-width: 1500px;
+    margin: 0 auto;
+  }
+  .pledge-row .pledge-art {
+    flex: 0 0 38%;
+    width: 38%;
+    max-width: 460px;
+    max-height: 70vh;
+    height: auto;
+    object-fit: contain;
+  }
+  /* Override base .pledge width/max-width so flex actually splits the row */
+  .pledge-row > .pledge {
+    flex: 1 1 0;
+    width: auto;
+    max-width: 720px;
+    margin: 0;
+    text-align: left;
+  }
+  .pledge-row .pledge h2,
+  .pledge-row .pledge p.big {
+    text-align: center;
+  }
+  /* Stack vertically on small screens */
+  @media (max-width: 900px) {
+    .pledge-row { flex-direction: column; gap: 12px; }
+    .pledge-row .pledge-art { flex: 0 0 auto; width: 60%; max-height: 30vh; }
+    .pledge-row > .pledge { flex: 1 1 auto; width: 92%; text-align: center; }
+  }
 
   /* === CTA BUTTON === */
   .cta {
@@ -1805,6 +1959,9 @@
   <!-- SLIDE 1: TITLE -->
   <section class="slide active">
     <div class="title-stack" style="gap: 1.5vh;">
+      <div class="comic-bubble-wrap">
+        <div class="comic-bubble">Quanto tempo passi <span class="yellow">su internet</span>?</div>
+      </div>
       <img src="assets/welcome_upside_down_red.svg" alt="Welcome to the Upside Down" class="st-art banner no-float">
       <h1 style="font-size: clamp(2rem, 5vw, 4rem); letter-spacing: 4px;">MISSIONE <span class="flip" style="display:inline-block">SOTTOSOPRA</span></h1>
       <div class="subtitle" style="margin-top: -0.5vh;"><span class="caveat">Sicurezza in internet</span> · Per il Club dell'Adorni</div>
@@ -1887,6 +2044,7 @@
         <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
         <span class="timer">⏱ 3 MINUTI</span>
       </div>
+      <img src="assets/club_chibi_circle_yellow.svg" alt="Il Club" class="diary-art">
       <h2>Quanto del tuo tempo<br>passi al <u>Sottosopra</u>?</h2>
       <ul class="prompts">
         <li>In una giornata, quante ore stai sui social o sui giochi?</li>
@@ -1945,6 +2103,9 @@
   <section class="slide">
     <div class="chapter blue">Trucco segreto del Club</div>
     <h2>La regola del <span class="yellow-glow">"NONNO al PARCO"</span> 👴🌳</h2>
+    <div class="gang-banner">
+      <img src="assets/forest_kids_bikes_yellow.svg" alt="La squadra al parco">
+    </div>
     <div class="speech big-quote max-w-900">
       Prima di scrivere o postare qualcosa, chiediti:<br><br>
       <b class="glow-yellow" style="font-size:1.15em;">"Lo direi a uno sconosciuto seduto<br>sulla panchina del parco?"</b><br><br>
@@ -1971,13 +2132,14 @@
     <div class="chapter purple">📁 File caso #1 · classificato</div>
     <div class="story">
       <div class="story-tape"></div>
+      <img src="assets/demogorgon_silhouette_red.svg" alt="Demogorgone" class="story-art left-bottom">
       <div class="story-title">
         <span class="story-badge">CASO 001</span>
         L'amica misteriosa 🕵️
         <span class="real-badge">FATTI VERI</span>
       </div>
       <p>🏫 <b>Immagina una compagna dell'Adorni</b>, la tua età. Stesse corse in cortile, stessi compiti.</p>
-      <p>👧 Una <b>bambina di 10 anni</b> riceve un messaggio su TikTok da <i>"Francesco, 13 anni"</i>: «Ciao! Andiamo nella stessa città!»</p>
+      <p>👧 Una <b>bambina di 10 anni</b> riceve un messaggio su TikTok da <i>"Francesco, 13 anni"</i>: «Ciao! Viviamo nella stessa città!»</p>
       <p>💬 Chattano per settimane. Francesco è simpaticissimo: le chiede della <b>scuola (sì, proprio dell'Adorni)</b>, della musica, dei cantanti preferiti.</p>
       <p>📸 Poi Francesco chiede: «Mi mandi una foto mentre ti cambi? È normale, lo fanno le modelle.»</p>
       <p>😟 La bambina ha un dubbio strano allo stomaco. <b>Per fortuna parla con la mamma.</b></p>
@@ -1999,6 +2161,7 @@
         <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
         <span class="timer">⏱ 4 MINUTI</span>
       </div>
+      <img src="assets/dustin_yellow.svg" alt="Dustin" class="diary-art">
       <h2>Hai mai parlato con uno<br><u>sconosciuto</u> online?</h2>
       <ul class="prompts">
         <li>Su quale app è successo?</li>
@@ -2057,12 +2220,13 @@
     <div class="chapter purple">📁 File caso #2 · classificato</div>
     <div class="story">
       <div class="story-tape"></div>
+      <img src="assets/club_chibi_circle_yellow.svg" alt="Il Club" class="story-art left-bottom">
       <div class="story-title">
         <span class="story-badge">CASO 002</span>
         I 10.000 Robux gratis 💎
         <span class="real-badge">FATTI VERI</span>
       </div>
-      <p>🏫 <b>Quasi tutti, all'Adorni, hanno giocato almeno una volta a Roblox.</b> Anche tu? Anche un tuo compagno di banco?</p>
+      <p>🏫 <b>Quasi tutti, alla vostra età, hanno giocato almeno una volta a Roblox.</b> Anche tu? Anche un tuo compagno di banco all'Adorni?</p>
       <p>👦 Un bambino gioca a Roblox tutti i pomeriggi. Ha tante skin e un avatar fortissimo.</p>
       <p>🎬 Su YouTube vede: <i>"Come avere 10.000 Robux GRATIS in 1 minuto!"</i> Il bambino del video sembra contentissimo.</p>
       <p>🖱️ Clicca sul link. Si apre una pagina <b>identica</b> a Roblox. Inserisce nome utente e password.</p>
@@ -2086,6 +2250,7 @@
         <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
         <span class="timer">⏱ 3 MINUTI</span>
       </div>
+      <img src="assets/club_chibi_circle_red.svg" alt="Il Club" class="diary-art">
       <h2>Cosa rende un'offerta<br><u>"GRATIS"</u> sospetta?</h2>
       <ul class="prompts">
         <li>Quali parole vedi sempre nelle trappole? (Es. GRATIS, ULTIMA OCCASIONE, SOLO OGGI…)</li>
@@ -2100,35 +2265,8 @@
     <div class="chapter red">Episodio 7 · Vecna · <span class="caveat" style="font-size:1.2em; letter-spacing:0;">tick… tock…</span></div>
     <h2><span class="red-glow">VECNA</span> e le parole che feriscono 💀</h2>
     <div class="row mt-2">
-      <!-- Grandfather Clock (Vecna's signature) -->
-      <svg class="clock-icon" viewBox="0 0 140 240" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="clock-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#5a3a1a"/>
-            <stop offset="100%" stop-color="#2d1808"/>
-          </linearGradient>
-        </defs>
-        <path d="M30 20 Q70 0 110 20 L100 35 L40 35 Z" fill="url(#clock-grad)"/>
-        <rect x="20" y="35" width="100" height="180" rx="4" fill="url(#clock-grad)"/>
-        <rect x="30" y="45" width="80" height="160" rx="2" fill="#1c0d04"/>
-        <circle cx="70" cy="80" r="28" fill="#fef3c7" stroke="#5a3a1a" stroke-width="3"/>
-        <line x1="70" y1="55" x2="70" y2="60" stroke="#3b0d0d" stroke-width="2"/>
-        <line x1="70" y1="100" x2="70" y2="105" stroke="#3b0d0d" stroke-width="2"/>
-        <line x1="45" y1="80" x2="50" y2="80" stroke="#3b0d0d" stroke-width="2"/>
-        <line x1="90" y1="80" x2="95" y2="80" stroke="#3b0d0d" stroke-width="2"/>
-        <line x1="70" y1="80" x2="70" y2="65" stroke="#3b0d0d" stroke-width="3" stroke-linecap="round"/>
-        <line x1="70" y1="80" x2="83" y2="80" stroke="#3b0d0d" stroke-width="2.5" stroke-linecap="round"/>
-        <circle cx="70" cy="80" r="3" fill="#3b0d0d"/>
-        <rect x="50" y="120" width="40" height="80" rx="2" fill="#0a0500"/>
-        <g class="pendulum">
-          <line x1="70" y1="125" x2="70" y2="180" stroke="#a16207" stroke-width="2"/>
-          <circle cx="70" cy="185" r="9" fill="#fbbf24" stroke="#92400e" stroke-width="1.5"/>
-        </g>
-        <rect x="15" y="215" width="110" height="15" rx="2" fill="#3b0d0d"/>
-        <circle cx="70" cy="80" r="40" fill="#dc2626" opacity="0.18">
-          <animate attributeName="opacity" values="0.1;0.3;0.1" dur="2s" repeatCount="indefinite"/>
-        </circle>
-      </svg>
+      <!-- Vecna grandfather clock (user-provided SVG) -->
+      <img src="assets/vecna_clock.svg" alt="Vecna grandfather clock" class="clock-icon">
       <img src="assets/demogorgon_silhouette_red.svg" alt="Vecna" class="st-art small">
       <div class="speech walkie" style="max-width:520px;">
         Vecna ferisce con la <b class="glow-red">mente</b>: entra nella testa con <b>parole cattive</b> e fa sentire piccoli, brutti, sbagliati. <b>Max</b> ne è stata vittima.<br><br>
@@ -2141,52 +2279,15 @@
   <section class="slide">
     <h2>Come <span class="yellow-glow">sconfiggere Vecna</span> 🎵</h2>
     <div class="row" style="margin-bottom:1.5vh;">
-      <!-- Walkman with orange headphones (Max's scene) -->
-      <svg class="walkman-icon" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="wm-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="#e5e7eb"/>
-            <stop offset="100%" stop-color="#9ca3af"/>
-          </linearGradient>
-        </defs>
-        <!-- Headphones band -->
-        <path d="M30 95 Q100 25 170 95" stroke="#1f2937" stroke-width="6" fill="none"/>
-        <!-- Left ear cup -->
-        <circle cx="30" cy="100" r="22" fill="#f97316" stroke="#1f2937" stroke-width="3"/>
-        <circle cx="30" cy="100" r="10" fill="#1f2937"/>
-        <!-- Right ear cup -->
-        <circle cx="170" cy="100" r="22" fill="#f97316" stroke="#1f2937" stroke-width="3"/>
-        <circle cx="170" cy="100" r="10" fill="#1f2937"/>
-        <!-- Cord to walkman -->
-        <path d="M170 122 Q160 140 130 145" stroke="#1f2937" stroke-width="2.5" fill="none"/>
-        <!-- Walkman body -->
-        <rect x="70" y="125" width="80" height="50" rx="4" fill="url(#wm-grad)" stroke="#1f2937" stroke-width="2.5"/>
-        <!-- Cassette window -->
-        <rect x="78" y="133" width="64" height="22" rx="2" fill="#1f2937"/>
-        <!-- Tape reels -->
-        <circle cx="93" cy="144" r="6" fill="#e5e7eb" stroke="#1f2937" stroke-width="1.5">
-          <animateTransform attributeName="transform" type="rotate" from="0 93 144" to="360 93 144" dur="4s" repeatCount="indefinite"/>
-        </circle>
-        <circle cx="127" cy="144" r="6" fill="#e5e7eb" stroke="#1f2937" stroke-width="1.5">
-          <animateTransform attributeName="transform" type="rotate" from="0 127 144" to="360 127 144" dur="4s" repeatCount="indefinite"/>
-        </circle>
-        <!-- Buttons -->
-        <rect x="80" y="161" width="8" height="8" rx="1" fill="#1f2937"/>
-        <rect x="92" y="161" width="8" height="8" rx="1" fill="#1f2937"/>
-        <rect x="104" y="161" width="8" height="8" rx="1" fill="#dc2626"/>
-        <rect x="116" y="161" width="8" height="8" rx="1" fill="#1f2937"/>
-        <!-- Music notes floating -->
-        <text x="20" y="50" font-family="serif" font-size="22" fill="#fbbf24" opacity="0.9">♪</text>
-        <text x="175" y="55" font-family="serif" font-size="26" fill="#fbbf24" opacity="0.9">♫</text>
-        <text x="40" y="20" font-family="serif" font-size="18" fill="#fbbf24" opacity="0.7">♬</text>
-      </svg>
+      <!-- Max walkman (user-provided SVG) -->
+      <img src="assets/max_walkman.svg" alt="Walkman di Max" class="walkman-icon">
       <div class="speech walkie" style="max-width:480px;">
         <b class="glow-yellow">Max</b> si è salvata da Vecna con la sua canzone preferita ('Running Up That Hill') e con <b>i suoi amici</b>.<br><br>
         Anche tu hai <b>la stessa arma</b>: persone vere intorno a te.
       </div>
     </div>
     <div class="grid" style="max-width:1100px; margin-top:2vh;">
-      <div class="card warn"><span class="icon">😢</span><strong>Se ti succede a TE</strong><p>Non rispondere. Fai uno screenshot. Parla SUBITO con mamma, papà o un'insegnante. Blocca chi attacca.</p></div>
+      <div class="card warn"><span class="icon">😢</span><strong>Se succede a TE</strong><p>Non rispondere. Fai uno screenshot. Parla SUBITO con mamma, papà o un'insegnante. Blocca chi attacca.</p></div>
       <div class="card warn"><span class="icon">👀</span><strong>Se lo vedi succedere</strong><p>Non ridere, non condividere. Sii amico di chi viene attaccato. Diglielo a un adulto.</p></div>
       <div class="card warn"><span class="icon">✋</span><strong>Prima di scrivere TU</strong><p>Conta fino a 5. Lo diresti in faccia? Se no, NON scriverlo.</p></div>
     </div>
@@ -2197,6 +2298,7 @@
     <div class="chapter purple">📁 File caso #3 · classificato</div>
     <div class="story">
       <div class="story-tape"></div>
+      <img src="assets/dustin_red.svg" alt="Dustin" class="story-art left-bottom">
       <div class="story-title">
         <span class="story-badge">CASO 003</span>
         I commenti cattivi 💬
@@ -2225,6 +2327,7 @@
         <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
         <span class="timer">⏱ 4 MINUTI</span>
       </div>
+      <img src="assets/chibi_characters_yellow.svg" alt="Il Club" class="diary-art top-left">
       <h2>Cosa diresti a Giulia<br>per <u>aiutarla</u>?</h2>
       <ul class="prompts">
         <li>Se Giulia fosse <b>una compagna dell'Adorni</b>, come la consoleresti?</li>
@@ -2262,6 +2365,7 @@
         <span class="badge-discuss">DISCUTI CON LA SQUADRA</span>
         <span class="timer">⏱ 3 MINUTI</span>
       </div>
+      <img src="assets/club_chibi_circle_pink.svg" alt="Il Club" class="diary-art">
       <h2>Quanto vale <u>un like</u>?</h2>
       <ul class="prompts">
         <li>Hai mai fatto qualcosa SOLO perché lo facevano gli altri?</li>
@@ -2337,6 +2441,9 @@
   <section class="slide">
     <div class="chapter">🏆 I CODICI DELL'ADORNI</div>
     <h2>Le 5 regole del <span class="yellow-glow">Club</span></h2>
+    <div class="gang-banner">
+      <img src="assets/chibi_characters_yellow.svg" alt="Il Club al completo">
+    </div>
     <div class="rules">
       <div class="rule">
         <div class="num">1</div>
@@ -2379,19 +2486,21 @@
   <!-- SLIDE 27: PLEDGE -->
   <section class="slide">
     <div class="chapter purple">⚡ Il giuramento del Club</div>
-    <img src="assets/friends_dont_lie_yellow.svg" alt="Friends Don't Lie" class="st-art large yellow-glow-art" style="margin-bottom:-1vh; max-height:38vh;">
-    <div class="pledge" style="margin-top:0;">
-      <h2 style="margin-top:14px; font-size: clamp(1.3rem, 2.6vw, 2rem);">Il Patto del Club dell'Adorni</h2>
-      <p style="font-size:clamp(1.1rem,2.1vw,1.55rem); margin-bottom:1vh; color: var(--text-dim);">Io, membro/a del Club dell'Adorni, prometto di:</p>
-      <ul>
-        <li>⚡ Proteggere i miei EGGOS (informazioni personali)</li>
-        <li>⚡ Non parlare con i Demogorgoni online</li>
-        <li>⚡ Pensare prima di cliccare o scrivere</li>
-        <li>⚡ Sconfiggere Vecna con la gentilezza</li>
-        <li>⚡ Dire NO alle sfide del Mind Flayer</li>
-        <li>⚡ Usare sempre il walkie-talkie 📻 con un adulto</li>
-      </ul>
-      <p class="big" style="margin-top:1vh;" class="glow-yellow">🦸 Sei pronto/a per la missione?</p>
+    <div class="pledge-row">
+      <img src="assets/friends_dont_lie_yellow.svg" alt="Friends Don't Lie" class="yellow-glow-art pledge-art">
+      <div class="pledge">
+        <h2 style="margin-top:14px; font-size: clamp(1.3rem, 2.6vw, 2rem);">Il Patto del Club dell'Adorni</h2>
+        <p style="font-size:clamp(1.1rem,2.1vw,1.55rem); margin-bottom:1vh; color: var(--text-dim);">Io, membro/a del Club dell'Adorni, prometto di:</p>
+        <ul>
+          <li>⚡ Proteggere i miei EGGOS (informazioni personali)</li>
+          <li>⚡ Non parlare con i Demogorgoni online</li>
+          <li>⚡ Pensare prima di cliccare o scrivere</li>
+          <li>⚡ Sconfiggere Vecna con la gentilezza</li>
+          <li>⚡ Dire NO alle sfide del Mind Flayer</li>
+          <li>⚡ Usare sempre il walkie-talkie 📻 con un adulto</li>
+        </ul>
+        <p class="big glow-yellow" style="margin-top:1vh;">🦸 Sei pronto/a per la missione?</p>
+      </div>
     </div>
   </section>
 
