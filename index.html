@@ -729,14 +729,13 @@
   }
   .tap-zone.disabled { cursor: default; pointer-events: none; }
 
-  /* On-hover hint arrows */
+  /* On-hover hint arrows (chevrons pointing toward navigation direction) */
   .tap-zone::before {
     content: '';
     position: absolute;
     top: 50%;
-    width: 38px;
-    height: 38px;
-    transform: translateY(-50%) rotate(45deg);
+    width: 28px;
+    height: 28px;
     border: 3px solid var(--hawkins-yellow);
     border-top: 0;
     border-left: 0;
@@ -746,10 +745,13 @@
   }
   .tap-zone.tap-prev::before {
     left: 22px;
+    /* points LEFT */
     transform: translateY(-50%) rotate(135deg);
   }
   .tap-zone.tap-next::before {
     right: 22px;
+    /* points RIGHT */
+    transform: translateY(-50%) rotate(-45deg);
   }
   .tap-zone:hover:not(.disabled)::before { opacity: 0.9; }
 
@@ -2132,7 +2134,6 @@
     <div class="chapter purple">📁 File caso #1 · classificato</div>
     <div class="story">
       <div class="story-tape"></div>
-      <img src="assets/demogorgon_silhouette_red.svg" alt="Demogorgone" class="story-art left-bottom">
       <div class="story-title">
         <span class="story-badge">CASO 001</span>
         L'amica misteriosa 🕵️
@@ -2220,7 +2221,6 @@
     <div class="chapter purple">📁 File caso #2 · classificato</div>
     <div class="story">
       <div class="story-tape"></div>
-      <img src="assets/club_chibi_circle_yellow.svg" alt="Il Club" class="story-art left-bottom">
       <div class="story-title">
         <span class="story-badge">CASO 002</span>
         I 10.000 Robux gratis 💎
@@ -2265,9 +2265,8 @@
     <div class="chapter red">Episodio 7 · Vecna · <span class="caveat" style="font-size:1.2em; letter-spacing:0;">tick… tock…</span></div>
     <h2><span class="red-glow">VECNA</span> e le parole che feriscono 💀</h2>
     <div class="row mt-2">
-      <!-- Vecna grandfather clock (user-provided SVG) -->
-      <img src="assets/vecna_clock.svg" alt="Vecna grandfather clock" class="clock-icon">
-      <img src="assets/demogorgon_silhouette_red.svg" alt="Vecna" class="st-art small">
+      <!-- Vecna chibi-circle (user-provided SVG, red variant) -->
+      <img src="assets/club_chibi_circle_red.svg" alt="Vecna" class="clock-icon">
       <div class="speech walkie" style="max-width:520px;">
         Vecna ferisce con la <b class="glow-red">mente</b>: entra nella testa con <b>parole cattive</b> e fa sentire piccoli, brutti, sbagliati. <b>Max</b> ne è stata vittima.<br><br>
         Scrivere commenti cattivi online <b>fa male come uno schiaffo</b>: tutti possono leggerli, e restano lì <span class="glow-red">per sempre</span>.
@@ -2279,8 +2278,8 @@
   <section class="slide">
     <h2>Come <span class="yellow-glow">sconfiggere Vecna</span> 🎵</h2>
     <div class="row" style="margin-bottom:1.5vh;">
-      <!-- Max walkman (user-provided SVG) -->
-      <img src="assets/max_walkman.svg" alt="Walkman di Max" class="walkman-icon">
+      <!-- Max squadra (user-provided SVG, yellow variant) -->
+      <img src="assets/chibi_characters_yellow.svg" alt="La squadra di Max" class="walkman-icon">
       <div class="speech walkie" style="max-width:480px;">
         <b class="glow-yellow">Max</b> si è salvata da Vecna con la sua canzone preferita ('Running Up That Hill') e con <b>i suoi amici</b>.<br><br>
         Anche tu hai <b>la stessa arma</b>: persone vere intorno a te.
@@ -2298,7 +2297,6 @@
     <div class="chapter purple">📁 File caso #3 · classificato</div>
     <div class="story">
       <div class="story-tape"></div>
-      <img src="assets/dustin_red.svg" alt="Dustin" class="story-art left-bottom">
       <div class="story-title">
         <span class="story-badge">CASO 003</span>
         I commenti cattivi 💬
